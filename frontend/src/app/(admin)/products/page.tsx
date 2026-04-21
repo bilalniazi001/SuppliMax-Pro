@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '@/config';
 import Link from 'next/link';
 import ProductList from '@/components/ProductList'; 
 
@@ -25,7 +26,7 @@ type Product = {
   isExclusive?: boolean;
 };
 
-const API_BASE_URL = 'https://supplimax-back-production.up.railway.app';
+
 
 async function getProducts(): Promise<Product[]> {
   try {

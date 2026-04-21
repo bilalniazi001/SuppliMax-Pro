@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '@/config';
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link'; 
@@ -11,8 +12,8 @@ interface CategoryItem {
 }
 
 // ✅ Dynamic Base URL Setup
-const API_BASE_URL = 'https://supplimax-back-production.up.railway.app';
-//const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+
 
 export default function ProductCategoryQueue() {
   const [categoriesData, setCategoriesData] = useState<CategoryItem[]>([]);

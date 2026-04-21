@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '@/config';
 "use client";
 import Header from "@/components/UI-UX/common/Header";
 import HeroSection from "@/components/UI-UX/common/HeroSection";

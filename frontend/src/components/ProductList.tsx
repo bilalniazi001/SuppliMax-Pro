@@ -1,4 +1,5 @@
-'use client'; 
+'use client';
+import { API_BASE_URL } from '@/config'; 
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -20,8 +21,8 @@ type Product = {
 };
 
 // ✅ Dynamic Base URL (Vercel ke liye zaroori hy)
-const API_BASE_URL = 'https://supplimax-back-production.up.railway.app';
-//const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'; 
+
+ 
 
 interface ProductListProps {
   products: Product[];
