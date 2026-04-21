@@ -51,7 +51,7 @@ export class AuthController {
       return {
         message: 'Admin user created successfully',
         admin: {
-          id: admin._id,
+          id: admin.id,
           email: admin.email,
           role: admin.role
         }

@@ -43,7 +43,7 @@ export class ProductsService {
       
       if (filters && Object.keys(filters).length > 0) {
         // Simple filter implementation
-        const conditions = [];
+        const conditions: any[] = [];
         if (filters.category) conditions.push(eq(schema.products.category, filters.category));
         if (filters.isFeatured !== undefined) conditions.push(eq(schema.products.isFeatured, filters.isFeatured));
         if (filters.isExclusive !== undefined) conditions.push(eq(schema.products.isExclusive, filters.isExclusive));
