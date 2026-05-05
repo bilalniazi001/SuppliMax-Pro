@@ -112,7 +112,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         alert(`Product successfully ${isEditMode ? 'updated' : 'created'}!`);
         
         // ✅ Redirect after success
-        router.push('/products'); 
+        router.push('/admin/products'); 
         router.refresh();
 
     } catch (err: any) {
@@ -141,11 +141,11 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col">
             <label className="text-sm font-semibold text-gray-700 mb-1">Product Name *</label>
-            <input name="name" type="text" value={formData.name} onChange={handleChange} required className="p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" />
+            <input name="name" type="text" value={formData.name} onChange={handleChange} required className="p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-[#2D3B29] placeholder:text-[#2D3B29]/70" />
           </div>
           <div className="flex flex-col">
             <label className="text-sm font-semibold text-gray-700 mb-1">Category *</label>
-            <select name="category" value={formData.category} onChange={handleChange} className="p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
+            <select name="category" value={formData.category} onChange={handleChange} className="p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-[#2D3B29]">
               {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
             </select>
           </div>
@@ -154,16 +154,16 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         {/* Row 2: Price, Cost, Stock */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-700 mb-1">Price ($) *</label>
-            <input name="price" type="number" step="0.01" value={formData.price} onChange={handleChange} required className="p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" />
+            <label className="text-sm font-semibold text-gray-700 mb-1">Price (Rs) *</label>
+            <input name="price" type="number" step="0.01" value={formData.price} onChange={handleChange} required className="p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-[#2D3B29] placeholder:text-[#2D3B29]/70" />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-700 mb-1">Cost ($) *</label>
-            <input name="cost" type="number" step="0.01" value={formData.cost} onChange={handleChange} required className="p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" />
+            <label className="text-sm font-semibold text-gray-700 mb-1">Cost (Rs) *</label>
+            <input name="cost" type="number" step="0.01" value={formData.cost} onChange={handleChange} required className="p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-[#2D3B29] placeholder:text-[#2D3B29]/70" />
           </div>
           <div className="flex flex-col">
             <label className="text-sm font-semibold text-gray-700 mb-1">Stock Qty *</label>
-            <input name="quantityInStock" type="number" value={formData.quantityInStock} onChange={handleChange} required className="p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" />
+            <input name="quantityInStock" type="number" value={formData.quantityInStock} onChange={handleChange} required className="p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-[#2D3B29] placeholder:text-[#2D3B29]/70" />
           </div>
         </div>
 
@@ -171,7 +171,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         <div className="grid grid-cols-1 gap-4">
             <label className="text-sm font-semibold text-gray-700">Image URL</label>
             <div className="flex items-center gap-4">
-                <input name="imageUrl" type="text" value={formData.imageUrl} onChange={handleChange} className="flex-1 p-2.5 border border-gray-300 rounded-lg outline-none" placeholder="Paste image link here..." />
+                <input name="imageUrl" type="text" value={formData.imageUrl} onChange={handleChange} className="flex-1 p-2.5 border border-gray-300 rounded-lg outline-none text-[#2D3B29] placeholder:text-[#2D3B29]/70" placeholder="Paste image link here..." />
                 {formData.imageUrl && <img src={formData.imageUrl} alt="preview" className="w-12 h-12 object-cover rounded border" />}
             </div>
         </div>
@@ -179,7 +179,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         {/* Description */}
         <div className="flex flex-col">
           <label className="text-sm font-semibold text-gray-700 mb-1">Description *</label>
-          <textarea name="description" rows={3} value={formData.description} onChange={handleChange} required className="p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-green-500" />
+          <textarea name="description" rows={3} value={formData.description} onChange={handleChange} required className="p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-green-500 text-[#2D3B29] placeholder:text-[#2D3B29]/70" />
         </div>
 
         {/* Checkboxes Grid */}
@@ -206,8 +206,8 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                 <input name="discountPercentage" type="number" value={formData.discountPercentage} onChange={handleChange} className="block w-20 p-1 mt-1 border rounded" />
             </div>
             <div className="text-right">
-                <p className="text-xs text-gray-500 line-through">${formData.price.toFixed(2)}</p>
-                <p className="text-lg font-bold text-green-700">${(formData.price * (1 - formData.discountPercentage / 100)).toFixed(2)}</p>
+                <p className="text-xs text-gray-500 line-through">{formData.price.toFixed(2)} Rs</p>
+                <p className="text-lg font-bold text-green-700">{(formData.price * (1 - formData.discountPercentage / 100)).toFixed(2)} Rs</p>
             </div>
           </div>
         )}

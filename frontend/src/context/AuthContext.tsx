@@ -20,7 +20,7 @@ export interface User {
 
 interface SignupData {
   name: string;
-  age: string;
+  age: number | string;
   email: string;
   phone: string;
   password: string;
@@ -37,6 +37,10 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   adminLogin: (email: string, password: string) => Promise<boolean>;
   signup: (userData: SignupData) => Promise<boolean>;
+  googleLogin: (googleToken: string) => Promise<boolean>;
+  updateProfile: (userData: Partial<User>) => Promise<boolean>;
+  deleteAccount: () => Promise<boolean>;
+  changePassword: (cnic: string, phone: string, newPassword: string) => Promise<{success: boolean, message: string}>;
   logout: () => void;
   loading: boolean;
   isAuthenticated: boolean;
@@ -97,9 +101,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
+        console.log('✅ User login successful');
         handleAuthSuccess(data);
         return true;
       }
+      
+      const errorData = await response.json();
+      console.error('❌ Login failed:', errorData.message || response.statusText);
+      alert(errorData.message || 'Login failed. Please check your credentials.');
       return false;
     } catch (error) {
       console.error('🚨 Login Error:', error);
@@ -121,9 +130,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
+        console.log('✅ Admin login successful');
         handleAuthSuccess(data);
         return true;
       }
+
+      const errorData = await response.json();
+      console.error('❌ Admin login failed:', errorData.message || response.statusText);
       return false;
     } catch (error) {
       console.error('🚨 Admin Login Error:', error);
@@ -145,10 +158,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
+        console.log('✅ User registration successful');
         handleAuthSuccess(data);
         return true;
       }
+      
       const errorData = await response.json();
+      console.error('❌ Registration failed:', errorData.message || response.statusText);
       alert(errorData.message || 'Signup failed');
       return false;
     } catch (error) {
@@ -166,11 +182,117 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAuthenticated(false);
   };
 
+  // ✅ Google Login
+  const googleLogin = async (googleToken: string): Promise<boolean> => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: googleToken }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Google login successful');
+        handleAuthSuccess(data);
+        return true;
+      }
+      const errorData = await response.json();
+      console.error('❌ Google login failed:', errorData.message);
+      return false;
+    } catch (error) {
+      console.error('🚨 Google Login Error:', error);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Update Profile
+  const updateProfile = async (userData: Partial<User>): Promise<boolean> => {
+    if (!user) return false;
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/users/${user.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      });
+
+      if (response.ok) {
+        const updatedUser = await response.json();
+        console.log('✅ Profile updated successful');
+        localStorage.setItem('user_data', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('🚨 Update Profile Error:', error);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Delete Account
+  const deleteAccount = async (): Promise<boolean> => {
+    if (!user) return false;
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/users/${user.id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        console.log('✅ Account deleted');
+        logout();
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('🚨 Delete Account Error:', error);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Change Password
+  const changePassword = async (cnic: string, phone: string, newPassword: string): Promise<{success: boolean, message: string}> => {
+    if (!user) return { success: false, message: 'User not logged in' };
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/users/${user.id}/change-password`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cnic, phone, newPassword }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log('✅ Password changed');
+        return { success: true, message: 'Password changed successfully' };
+      }
+      return { success: false, message: data.message || 'Failed to change password' };
+    } catch (error: any) {
+      console.error('🚨 Change Password Error:', error);
+      return { success: false, message: 'An error occurred' };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const value = {
     user,
     login,
     adminLogin,
     signup,
+    googleLogin,
+    updateProfile,
+    deleteAccount,
+    changePassword,
     logout,
     loading,
     isAuthenticated,

@@ -24,3 +24,96 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Shimmer Effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.button-shimmer {
+  position: relative;
+  overflow: hidden;
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite linear;
+}
+
+/* Global Button Styles to apply shimmer */
+button:not(.no-shimmer), .btn:not(.no-shimmer), a.inline-flex:not(.no-shimmer), a.inline-block:not(.no-shimmer) {
+  position: relative;
+  overflow: hidden;
+}
+
+button:not(.no-shimmer)::after, .btn:not(.no-shimmer)::after, a.inline-flex:not(.no-shimmer)::after, a.inline-block:not(.no-shimmer)::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transition: none;
+}
+
+button:not(.no-shimmer):hover::after, .btn:not(.no-shimmer):hover::after, a.inline-flex:not(.no-shimmer):hover::after, a.inline-block:not(.no-shimmer):hover::after {
+  left: 100%;
+  transition: all 0.8s ease;
+}
+
+
+/* Blog Content Styles */
+.blog-content p {
+  color: #374151 !important; /* gray-700 */
+  margin-bottom: 1.5rem;
+  line-height: 1.75;
+  font-size: 1.125rem;
+}
+.blog-content h3 {
+  color: #111827 !important; /* gray-900 */
+  font-weight: 800;
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+.blog-content ul, .blog-content ol {
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+  color: #374151 !important;
+}
+.blog-content li {
+  margin-bottom: 0.5rem;
+  list-style-type: disc;
+}
+.blog-content strong {
+  color: #111827 !important;
+  font-weight: 700;
+}
+.blog-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+}
+.blog-content th, .blog-content td {
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  text-align: left;
+}
+.blog-content th {
+  background-color: #f9fafb;
+  font-weight: 700;
+}

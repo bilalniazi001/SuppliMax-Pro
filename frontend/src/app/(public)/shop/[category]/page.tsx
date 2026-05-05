@@ -1,6 +1,10 @@
-// app/shop/[category]/page.tsx
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Star, Heart, Eye, ShoppingBag } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
+import { API_BASE_URL } from '@/config';
 
 // UPDATED: id and _id both supported
 interface Product {
@@ -19,55 +23,65 @@ interface Product {
   isNewArrival?: boolean;
 }
 
-// ✅ Dynamic URL setup
-const API_BASE_URL = 'https://supplimax-back-production.up.railway.app';
-//const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+export default function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [categoryName, setCategoryName] = useState('');
+  const { addToCart } = useCart();
 
-async function getCategoryProducts(category: string): Promise<Product[]> {
-  try {
-    // ✅ URL ko dynamic variable sy replace kar dia
-    const res = await fetch(`${API_BASE_URL}/products`, {
-      cache: 'no-store'
-    });
+  useEffect(() => {
+    const init = async () => {
+      const resolvedParams = await params;
+      const decodedCategory = decodeURIComponent(resolvedParams.category);
+      setCategoryName(decodedCategory);
+      
+      try {
+        const res = await fetch(`${API_BASE_URL}/products`, {
+          cache: 'no-store'
+        });
 
-    if (!res.ok) {
-      console.error('❌ Failed to fetch products:', res.status);
-      return [];
-    }
+        if (!res.ok) throw new Error('Failed to fetch products');
 
-    const allProducts = await res.json();
+        const result = await res.json();
+        
+        // ✅ Handle object with numeric keys or direct array
+        let rawProducts: any[] = [];
+        if (Array.isArray(result)) {
+          rawProducts = result;
+        } else if (result && typeof result === 'object') {
+          rawProducts = Object.values(result).filter(p => p && typeof p === 'object');
+        }
 
-    const filteredProducts = allProducts.filter((product: Product) =>
-      product.category?.toLowerCase() === category.toLowerCase()
-    );
+        const filteredProducts = rawProducts.filter((product: any) =>
+          product.category?.toLowerCase().trim() === decodedCategory.toLowerCase().trim()
+        );
 
-    console.log(
-      `✅ Category: ${category}, Products Found: ${filteredProducts.length}`
-    );
+        setProducts(filteredProducts.map((p, i) => ({
+          ...p,
+          id: p.id || p._id?.toString() || `cat-${i}`
+        })));
+      } catch (error) {
+        console.error('❌ Error fetching category products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return filteredProducts;
-  } catch (error) {
-    console.error('❌ Error fetching category products:', error);
-    return [];
-  }
-}
+    init();
+  }, [params]);
 
-interface CategoryPageProps {
-  params: Promise<{
-    category: string;
-  }>;
-}
-
-export default async function CategoryPage({ params }: CategoryPageProps) {
-  const { category } = await params;
-  const decodedCategory = decodeURIComponent(category);
-
-  const products = await getCategoryProducts(decodedCategory);
-
-  const formattedCategory = decodedCategory
+  const formattedCategory = categoryName
     .split('-')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-200">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#629D23]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-200 py-8">
@@ -110,56 +124,89 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map((product) => {
-              // ✅ MongoDB _id handling
               const productId = product.id || product._id;
 
-              return (
-                <Link
-                  href={`/products/${productId}`} // Yahan products (plural) kar dain agar detail page ka path yehi hy
-                  key={productId?.toString()}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300 group"
-                >
-                  <div className="relative h-56 bg-white overflow-hidden flex items-center justify-center p-4">
-                    <img
-                      src={product.imageUrl || '/placeholder-image.jpg'}
-                      alt={product.name}
-                      className="max-w-full max-h-40 object-contain transition duration-300 group-hover:opacity-90"
-                    />
+              const rating = product.rating || 4.6;
 
-                    <div className="absolute top-2 left-2 flex flex-col space-y-1">
-                      {product.onSale && (
-                        <span className="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
-                          {product.discountPercentage}% OFF
-                        </span>
-                      )}
+              return (
+                <div
+                  key={productId?.toString()}
+                  className="bg-white rounded-[24px] shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group flex flex-col p-3 relative"
+                >
+                  <div className="relative h-56 bg-[#F8F9FA] rounded-[20px] overflow-hidden flex items-center justify-center mb-4 group-hover:bg-gray-100 transition-colors">
+                    <Link href={`/product/${productId}`} className="w-full h-full flex items-center justify-center">
+                      <img
+                        src={product.imageUrl || 'https://images.unsplash.com/photo-1583454110551-21f2fa2ec617?w=800&auto=format&fit=crop&q=60'}
+                        alt={product.name}
+                        className="max-w-full max-h-48 object-contain transition-transform duration-500 group-hover:scale-110 mix-blend-multiply"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1583454110551-21f2fa2ec617?w=800&auto=format&fit=crop&q=60';
+                        }}
+                      />
+                    </Link>
+
+                    {/* Top Left Badges */}
+                    <div className="absolute top-3 left-3 flex flex-col space-y-2 z-10">
                       {product.isNewArrival && (
-                        <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">
+                        <span className="bg-[#629D23] text-white text-[11px] font-black px-3 py-1 rounded-full tracking-wide shadow-sm">
                           NEW
                         </span>
                       )}
+                      {product.onSale && (
+                        <span className="bg-red-600 text-white text-[11px] font-black px-3 py-1 rounded-full tracking-wide shadow-sm">
+                          {product.discountPercentage}% OFF
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Top Right Icons */}
+                    <div className="absolute top-3 right-3 flex flex-col space-y-2 z-10">
+                      <button className="w-9 h-9 bg-white rounded-full shadow-sm flex items-center justify-center text-[#0B1A28] hover:text-[#629D23] hover:shadow-md transition-all">
+                        <Heart className="w-[18px] h-[18px]" />
+                      </button>
+                      <button className="w-9 h-9 bg-white rounded-full shadow-sm flex items-center justify-center text-[#0B1A28] hover:text-[#629D23] hover:shadow-md transition-all">
+                        <Eye className="w-[18px] h-[18px]" />
+                      </button>
                     </div>
                   </div>
 
-                  <div className="p-4">
-                    <h3 className="font-semibold text-lg mb-2 line-clamp-2 hover:text-[#629D23]">
-                      {product.name}
-                    </h3>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-xl font-bold text-[#2D3B29]">
-                        ${product.price.toFixed(2)}
-                      </span>
-                      <div className="flex items-center">
-                        <span className="text-yellow-500">★</span>
-                        <span className="text-sm text-gray-600 ml-1">
-                          {product.rating.toFixed(1)}
-                        </span>
+                  <div className="px-2 pb-2 flex-grow flex flex-col">
+                    <Link href={`/product/${productId}`}>
+                      <h3 className="font-extrabold text-[#0B1A28] text-lg mb-1 line-clamp-2 hover:text-[#629D23] transition-colors leading-tight">
+                        {product.name}
+                      </h3>
+                    </Link>
+
+                    <div className="flex items-center mb-4 mt-1">
+                      <div className="flex items-center text-[#FFB800]">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className={`w-4 h-4 ${i < Math.floor(rating) ? 'fill-current' : 'text-gray-200 fill-transparent'}`} />
+                        ))}
                       </div>
+                      <span className="text-xs font-bold text-gray-400 ml-2">({rating.toFixed(1)})</span>
                     </div>
-                    <button className="w-full bg-[#2D3B29] text-white py-2 rounded-lg hover:bg-[#629D23] transition duration-300">
-                      Add to Cart
-                    </button>
+
+                    <div className="flex items-end justify-between mt-auto">
+                      <div className="flex flex-col">
+                        <span className="text-2xl font-black text-[#629D23] leading-none tracking-tight">
+                          {product.price} Rs
+                        </span>
+                        {product.onSale && (
+                          <span className="text-sm font-bold text-gray-400 line-through mt-1">
+                            {Math.round(product.price / (1 - product.discountPercentage / 100))} Rs
+                          </span>
+                        )}
+                      </div>
+                      
+                      <button 
+                        onClick={() => addToCart(product as any)}
+                        className="w-12 h-12 bg-[#0B1A28] text-white rounded-[14px] flex items-center justify-center hover:bg-[#629D23] transition-colors shadow-md hover:shadow-lg hover:-translate-y-1 transform duration-200 flex-shrink-0"
+                      >
+                        <ShoppingBag className="w-[22px] h-[22px]" />
+                      </button>
+                    </div>
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>

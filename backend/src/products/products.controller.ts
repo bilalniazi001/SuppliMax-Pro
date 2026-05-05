@@ -2,7 +2,7 @@ import {
   Controller, 
   Get, 
   Post, 
-  Put, //  ADDED
+  Put, 
   Body, 
   Patch, 
   Param, 
@@ -11,13 +11,16 @@ import {
   ValidationPipe,
   HttpException,
   HttpStatus,
-  Query
+  Query,
+  UseInterceptors
 } from '@nestjs/common';
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { ProductsService } from './products.service'; 
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
-@Controller('products') 
+@Controller('products')
+// @UseInterceptors(CacheInterceptor)
 export class ProductsController {
   
   constructor(private readonly productsService: ProductsService) {} 
@@ -62,8 +65,9 @@ export class ProductsController {
 
       return await this.productsService.findAll(filters);
     } catch (error) {
+      console.error('❌ [BACKEND] Controller error fetching products:', error);
       throw new HttpException(
-        'Failed to fetch products',
+        `Failed to fetch products: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
@@ -121,6 +125,8 @@ export class ProductsController {
   }
 
   @Get('featured/all')
+  @CacheKey('featured_products')
+  @CacheTTL(300)
   async findFeatured() {
     try {
       const featuredProducts = await this.productsService.findFeatured();
@@ -137,6 +143,8 @@ export class ProductsController {
   }
 
   @Get('exclusive/all')
+  @CacheKey('exclusive_products')
+  @CacheTTL(300)
   async findExclusive() {
     try {
       const exclusiveProducts = await this.productsService.findExclusive();
@@ -153,6 +161,8 @@ export class ProductsController {
   }
   
   @Get('categories/all')
+  @CacheKey('product_categories')
+  @CacheTTL(600)
   async getCategories() {
     try {
       const categories = await this.productsService.getCategoriesWithCount();

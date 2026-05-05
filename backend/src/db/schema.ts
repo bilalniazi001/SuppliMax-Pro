@@ -1,41 +1,79 @@
-import { pgTable, text, integer, doublePrecision, boolean, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { mysqlTable, varchar, text, int, double, boolean, timestamp } from 'drizzle-orm/mysql-core';
+import { sql } from 'drizzle-orm';
 
-export const users = pgTable('users', {
-  id: uuid('id').defaultRandom().primaryKey(),
+export const users = mysqlTable('users', {
+  id: varchar('id', { length: 36 }).primaryKey(),
   name: text('name').notNull(),
-  email: text('email').notNull().unique(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
   password: text('password').notNull(),
-  role: text('role').default('user').notNull(),
-  age: integer('age'),
-  phone: text('phone'),
+  role: varchar('role', { length: 50 }).default('user').notNull(),
+  age: int('age'),
+  phone: varchar('phone', { length: 50 }),
   address: text('address'),
-  city: text('city'),
-  country: text('country'),
-  postalCode: text('postal_code'),
-  nationality: text('nationality'),
-  cnic: text('cnic'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  city: varchar('city', { length: 100 }),
+  country: varchar('country', { length: 100 }),
+  postalCode: varchar('postalCode', { length: 50 }),
+  nationality: varchar('nationality', { length: 100 }),
+  cnic: varchar('cnic', { length: 50 }),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow().notNull(),
 });
 
-export const products = pgTable('products', {
-  id: text('id').primaryKey(), // Using text because it was a random string in MongoDB
+export const products = mysqlTable('products', {
+  id: varchar('id', { length: 255 }).primaryKey(),
   name: text('name').notNull(),
-  category: text('category').notNull(),
-  price: doublePrecision('price').notNull(),
-  rating: doublePrecision('rating').notNull(),
-  imageUrl: text('image_url').notNull(),
+  category: varchar('category', { length: 100 }).notNull(),
+  price: double('price').notNull(),
+  rating: double('rating').notNull(),
+  imageUrl: text('imageUrl').notNull(),
   description: text('description').notNull(),
-  cost: doublePrecision('cost').notNull(),
-  quantityInStock: integer('quantity_in_stock').notNull(),
-  size: text('size').default('One Size'),
-  color: text('color').default(''),
-  onSale: boolean('on_sale').default(false),
-  discountPercentage: integer('discount_percentage').default(0),
-  isNewArrival: boolean('is_new_arrival').default(false),
-  isInStock: boolean('is_in_stock').default(true),
-  isFeatured: boolean('is_featured').default(false),
-  isExclusive: boolean('is_exclusive').default(false),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  cost: double('cost').notNull(),
+  quantityInStock: int('quantityInStock').notNull(),
+  size: varchar('size', { length: 50 }).default('One Size'),
+  color: varchar('color', { length: 50 }).default(''),
+  onSale: boolean('onSale').default(false),
+  discountPercentage: int('discountPercentage').default(0),
+  isNewArrival: boolean('isNewArrival').default(false),
+  isInStock: boolean('isInStock').default(true),
+  isFeatured: boolean('isFeatured').default(false),
+  isExclusive: boolean('isExclusive').default(false),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow().notNull(),
+});
+
+export const orders = mysqlTable('orders', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  userId: varchar('userId', { length: 36 }).references(() => users.id).notNull(),
+  totalAmount: double('totalAmount').notNull(),
+  status: varchar('status', { length: 50 }).default('Not Shipped').notNull(),
+  address: text('address').notNull(),
+  phone: varchar('phone', { length: 50 }).notNull(),
+  paymentMethod: varchar('paymentMethod', { length: 50 }).default('Cash on Delivery').notNull(),
+  feedback: text('feedback'),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow().notNull(),
+});
+
+export const orderItems = mysqlTable('order_items', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  orderId: varchar('orderId', { length: 36 }).references(() => orders.id).notNull(),
+  productId: varchar('productId', { length: 255 }).references(() => products.id).notNull(),
+  quantity: int('quantity').notNull(),
+  price: double('price').notNull(),
+});
+
+export const cartItems = mysqlTable('cart_items', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  userId: varchar('userId', { length: 36 }).references(() => users.id).notNull(),
+  productId: varchar('productId', { length: 255 }).references(() => products.id).notNull(),
+  quantity: int('quantity').notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow().notNull(),
+});
+
+export const wishlistItems = mysqlTable('wishlist_items', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  userId: varchar('userId', { length: 36 }).references(() => users.id).notNull(),
+  productId: varchar('productId', { length: 255 }).references(() => products.id).notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
 });

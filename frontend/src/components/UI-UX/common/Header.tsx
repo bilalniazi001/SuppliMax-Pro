@@ -2,10 +2,14 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ShoppingCart, Heart, User, Search, ChevronDown, Facebook, Instagram, Youtube, Twitter } from 'lucide-react'; 
+import { ShoppingCart, Heart, User, Search, ChevronDown, Facebook, Instagram, Youtube, Twitter } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import AuthModal from '@/components/AuthModal';
+import { API_BASE_URL } from '@/config';
+import { useCart } from '@/context/CartContext';
+import { useWishlist } from '@/context/WishlistContext';
+import { useRouter } from 'next/navigation';
 
 // --- TYPE DEFINITIONS (Interfaces) ---
 interface TopLink {
@@ -28,14 +32,14 @@ interface DropdownMenuProps {
 const topLinks: TopLink[] = [
   { name: 'About Us', href: '/about' },
   { name: 'Contact', href: '/contacts' },
-  { name: 'Orders', href: '/' },
-  { name: 'FAQ', href: '/' },
+  { name: 'Orders', href: '/orders' },
+  { name: 'FAQ', href: '/faq' },
 ];
 
 // Static categories for header - these will match with ProductCategoryQueue
 const staticCategories = [
   'Protein',
-  'Pre Workout', 
+  'Pre Workout',
   'Weight Gainer',
   'Creatine',
   'BCAA',
@@ -45,27 +49,27 @@ const staticCategories = [
 
 const mainNavLinks: MainNavLink[] = [
   { name: 'Home', href: '/' },
-  { 
-    name: 'Shop', 
+  {
+    name: 'Shop',
     href: '/product',
     dropdown: [
       { name: 'Pre Workout', href: '/shop/Pre Workout' },
       { name: 'Protein', href: '/shop/Protein' },
       { name: 'Fat Burner', href: '/shop/Fat Burner' },
       { name: 'Creatine', href: '/shop/Creatine' }
-    ] 
+    ]
   },
-  { name: 'Offers', href: '/' },
-  { name: 'Blog', href: '/' },
-  { 
-    name: 'Pages', 
-    href: '#', 
+  { name: 'Offers', href: '/offers' },
+  { name: 'Blog', href: '/blog' },
+  {
+    name: 'Pages',
+    href: '#',
     dropdown: [
-      { name: 'Wishlist', href: '/' },
-      { name: 'Cart', href: '/' },
-      { name: 'Checkout', href: '/' },
+      { name: 'Wishlist', href: '/wishlist' },
+      { name: 'Cart', href: '/cart' },
+      { name: 'Orders', href: '/orders' },
       { name: 'Account', href: '/account' }
-    ] 
+    ]
   },
 ];
 
@@ -77,8 +81,8 @@ const allCategories: DropdownItem[] = staticCategories.map(category => ({
 const DropdownMenu: React.FC<DropdownMenuProps> = ({ items }) => (
   <div className="absolute top-full left-0 mt-0.5 w-64 bg-white shadow-xl overflow-hidden border border-gray-100 z-[100] opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto">
     {items.map((item: DropdownItem, index: number) => (
-      <Link 
-        key={index} 
+      <Link
+        key={index}
         href={item.href}
         className="block px-4 py-3 text-sm text-gray-700 hover:bg-[#629D23] hover:text-white transition-colors duration-150"
       >
@@ -93,23 +97,41 @@ export default function SuppliMaxNavbar() {
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [categories, setCategories] = useState<DropdownItem[]>(allCategories);
   const mainNavbarRef = useRef<HTMLDivElement>(null);
-  const [headerWrapperHeight, setHeaderWrapperHeight] = useState<number>(130); 
-  
+  const [headerWrapperHeight, setHeaderWrapperHeight] = useState<number>(130);
+
+  // Search state
+  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const router = useRouter();
+
   const { isAuthenticated, user, logout } = useAuth();
+  const { cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
 
   // Fetch categories from API to ensure consistency with ProductCategoryQueue
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://supplimax-back-production.up.railway.app');
+        const response = await fetch(`${API_BASE_URL}/products`);
         if (!response.ok) throw new Error('Failed to fetch products');
-        const products = await response.json();
+        const result = await response.json();
+
+        // ✅ Handle object with numeric keys or direct array
+        let products: any[] = [];
+        if (Array.isArray(result)) {
+          products = result;
+        } else if (result && typeof result === 'object') {
+          products = Object.values(result).filter(p => p && typeof p === 'object');
+        }
+        setAllProducts(products); // Store all products for search
 
         // Extract unique categories from products
         const categorySet = new Set<string>();
         products.forEach((product: any) => {
           if (product.category) {
-            categorySet.add(product.category);
+            categorySet.add(product.category.trim());
           }
         });
 
@@ -134,11 +156,11 @@ export default function SuppliMaxNavbar() {
   useEffect(() => {
     const headerWrapperElement = document.getElementById('header-wrapper');
     if (headerWrapperElement) {
-        setHeaderWrapperHeight(headerWrapperElement.offsetHeight);
+      setHeaderWrapperHeight(headerWrapperElement.offsetHeight);
     }
-    
+
     const handleScroll = () => {
-      const scrollThreshold = headerWrapperElement?.offsetHeight || headerWrapperHeight; 
+      const scrollThreshold = headerWrapperElement?.offsetHeight || headerWrapperHeight;
 
       if (window.scrollY > scrollThreshold) {
         setIsScrolled(true);
@@ -151,7 +173,31 @@ export default function SuppliMaxNavbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [headerWrapperHeight]);
 
-  const navHeight = 56; 
+  // Search autocomplete logic
+  useEffect(() => {
+    if (searchTerm.trim().length > 0) {
+      const lowercasedTerm = searchTerm.toLowerCase();
+      const filtered = allProducts.filter((p: any) =>
+        (p.name && p.name.toLowerCase().includes(lowercasedTerm)) ||
+        (p.category && p.category.toLowerCase().includes(lowercasedTerm))
+      ).slice(0, 5); // top 5 results
+      setSearchResults(filtered);
+      setShowDropdown(true);
+    } else {
+      setSearchResults([]);
+      setShowDropdown(false);
+    }
+  }, [searchTerm, allProducts]);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      setShowDropdown(false);
+      router.push(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+    }
+  };
+
+  const navHeight = 56;
 
   const stickyClass: string = isScrolled
     ? 'fixed top-0 left-0 right-0 shadow-lg animate-slide-down'
@@ -183,19 +229,19 @@ export default function SuppliMaxNavbar() {
       `}</style>
 
       {/* Auth Modal */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
       />
 
-      <div 
+      <div
         id="header-wrapper"
         className={`hidden lg:block relative z-40 transition-transform duration-300 ease-in-out ${isScrolled ? 'transform -translate-y-full' : 'transform translate-y-0'}`}
       >
         <div className={`bg-[#629D23] text-white py-2`}>
-          <div className="container mx-auto px-4 flex justify-between items-center text-xs font-medium relative"> 
+          <div className="container mx-auto px-4 flex justify-between items-center text-xs font-medium relative">
             <div className="flex-1 flex justify-start">
-              <nav className="flex space-x-4"> 
+              <nav className="flex space-x-4">
                 {topLinks.map((link: TopLink) => (
                   <Link key={link.name} href={link.href} className="hover:text-amber-300 transition-colors duration-150">{link.name}</Link>
                 ))}
@@ -215,30 +261,93 @@ export default function SuppliMaxNavbar() {
 
         <header className={`bg-white py-4 shadow-sm`}>
           <div className="container mx-auto px-4 flex items-center justify-between">
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 ml-12">
               <Link href="/">
-                <h1 className="text-4xl font-extrabold text-[#629D23] tracking-tight hover:text-[#4a7a1b] transition-colors cursor-pointer">SuppliMax</h1>
+                <img src="/Images/sm-logo.png" alt="SuppliMax" className="h-12 w-auto hover:opacity-80 transition-opacity cursor-pointer" />
               </Link>
             </div>
-            <div className="flex-1 max-w-xl mx-8">
-              <div className="relative flex w-full">
-                <input type="text" placeholder="Search for products..." className="w-full pl-5 pr-20 py-3 border border-gray-300  focus:ring-1 focus:ring-[#629D23] focus:border-[#629D23] outline-none transition-all duration-200" />
-                <span className="absolute right-0 top-0 h-full px-6 text-white bg-[#629D23] hover:bg-[#2D3B29] transition-colors flex items-center justify-center">
-                 Search <Search className="w-5 h-5 ml-2" />
-                </span>
-              </div>
+            <div className="flex-1 max-w-xl mx-8 relative">
+              <form onSubmit={handleSearchSubmit} className="flex w-full shadow-sm rounded-md overflow-hidden">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onFocus={() => { if (searchTerm) setShowDropdown(true); }}
+                  onBlur={() => setTimeout(() => setShowDropdown(false), 200)} // delay to allow clicks
+                  placeholder="Search for products..."
+                  className="flex-1 pl-5 pr-4 py-3 border-y border-l border-gray-300 font-semibold text-[#629D23] placeholder:text-[#629D23]/70 focus:ring-1 focus:ring-[#629D23] outline-none transition-all duration-200"
+                />
+                <button
+                  type="submit"
+                  onClick={handleSearchSubmit}
+                  className="px-6 py-3 text-white bg-[#629D23] hover:bg-[#2D3B29] transition-colors flex items-center justify-center font-bold cursor-pointer"
+                >
+                  Search <Search className="w-5 h-5 ml-2" />
+                </button>
+              </form>
+
+              {/* Autocomplete Dropdown */}
+              {showDropdown && searchResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 shadow-xl z-50 rounded-b-md overflow-hidden">
+                  {searchResults.map((product, index) => {
+                    const productId = product.id || product._id || `search-res-${index}`;
+                    return (
+                      <Link
+                        key={productId}
+                        href={`/product/${productId}`}
+                        className="flex items-center p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                        onClick={() => setShowDropdown(false)}
+                      >
+                        <div className="w-12 h-12 flex-shrink-0 bg-gray-100 rounded mr-4 overflow-hidden flex items-center justify-center">
+                          <img
+                            src={product.imageUrl || 'https://images.unsplash.com/photo-1579758629938-03607ccdbaba?w=50&h=50&fit=crop'}
+                            alt={product.name}
+                            className="max-w-full max-h-full object-contain mix-blend-multiply"
+                            onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1579758629938-03607ccdbaba?w=50&h=50&fit=crop'; }}
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-gray-900 truncate">{product.name}</p>
+                          <p className="text-xs text-gray-500 truncate">{product.category}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold text-[#629D23]">Rs {product.price}</p>
+                        </div>
+                      </Link>
+                    )
+                  })}
+                  <div className="p-2 text-center bg-gray-50 hover:bg-gray-100 cursor-pointer border-t border-gray-200">
+                    <button
+                      onClick={(e) => { e.preventDefault(); handleSearchSubmit(e as any); }}
+                      className="text-sm text-[#629D23] font-bold w-full h-full"
+                    >
+                      View all results
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex items-center space-x-6">
-              <span className="flex flex-col items-center justify-center text-gray-600 hover:text-[#629D23] transition-colors group">
+              <Link href="/wishlist" className="flex flex-col items-center justify-center text-gray-600 hover:text-[#629D23] transition-colors group relative">
                 <Heart className="w-6 h-6 transform group-hover:scale-110 transition-transform" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full animate-bounce">
+                    {wishlistCount}
+                  </span>
+                )}
                 <span className="text-xs font-medium mt-1">Wishlist</span>
-              </span>
-              
-              <span className="flex flex-col items-center justify-center text-gray-600 hover:text-[#629D23] transition-colors group relative">
+              </Link>
+
+              <Link href="/cart" className="flex flex-col items-center justify-center text-gray-600 hover:text-[#629D23] transition-colors group relative">
                 <ShoppingCart className="w-6 h-6 transform group-hover:scale-110 transition-transform" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#629D23] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full animate-bounce">
+                    {cartCount}
+                  </span>
+                )}
                 <span className="text-xs font-medium mt-1">Cart</span>
-              </span>
-              
+              </Link>
+
               {isAuthenticated ? (
                 <div className="relative group">
                   <div className="flex flex-col items-center justify-center text-gray-600 hover:text-[#629D23] transition-colors group cursor-pointer">
@@ -247,7 +356,7 @@ export default function SuppliMaxNavbar() {
                     </div>
                     <span className="text-xs font-medium mt-1">Account</span>
                   </div>
-                  
+
                   <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-xl border border-gray-100 rounded-lg z-[100] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
                     <div className="p-3 border-b border-gray-100">
                       <p className="text-sm font-semibold text-gray-800 truncate">{user?.name}</p>
@@ -256,10 +365,13 @@ export default function SuppliMaxNavbar() {
                     <Link href="/account" className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#629D23] hover:text-white transition-colors">
                       My Account
                     </Link>
+                    <Link href="/orders" className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#629D23] hover:text-white transition-colors">
+                      My Orders
+                    </Link>
                     <span className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#629D23] hover:text-white transition-colors">
-                      My Cart 
+                      My Cart
                     </span>
-                    <button 
+                    <button
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                     >
@@ -268,7 +380,7 @@ export default function SuppliMaxNavbar() {
                   </div>
                 </div>
               ) : (
-                <button 
+                <button
                   onClick={() => setShowAuthModal(true)}
                   className="flex flex-col items-center justify-center text-gray-600 hover:text-[#629D23] transition-colors group"
                 >
@@ -280,12 +392,12 @@ export default function SuppliMaxNavbar() {
           </div>
         </header>
       </div>
-      
+
       {isScrolled && <div style={{ height: navHeight }} className="hidden lg:block" />}
-      
+
       <nav ref={mainNavbarRef} className={`bg-[#4a7a1b] text-white z-60 w-full ${stickyClass}`}>
         <div className="container mx-auto px-4 flex items-center justify-between h-14">
-          
+
           <div className="relative group bg-[#629D23] hover:bg-[#2D3B29] h-full flex items-center transition-colors px-6 cursor-pointer z-[70]">
             <div className="flex items-center space-x-2 font-bold text-lg">
               <span className='w-5 h-5'>
@@ -318,31 +430,31 @@ export default function SuppliMaxNavbar() {
           </div>
         </div>
       </nav>
-      
+
       <div className="lg:hidden bg-white shadow-md p-3 flex justify-between items-center sticky top-0 z-50">
-          <Link href="/">
-            <h1 className="text-xl font-extrabold text-[#629D23]">SuppliMax</h1>
-          </Link>
-          <div className="flex space-x-3">
-              <Search className="w-6 h-6 text-gray-600"/>
-            
-              <Heart className="w-6 h-6 text-gray-600"/>
-            
-            
-              <ShoppingCart className="w-6 h-6 text-gray-600"/>
-            
-            {isAuthenticated ? (
-              <Link href="/account">
-                <div className="w-6 h-6 bg-[#629D23] rounded-full flex items-center justify-center text-white text-xs font-bold">
-                  {user ? getUserInitials(user.name) : 'U'}
-                </div>
-              </Link>
-            ) : (
-              <button onClick={() => setShowAuthModal(true)}>
-                <User className="w-6 h-6 text-gray-600"/>
-              </button>
-            )}
-          </div>
+        <Link href="/">
+          <img src="/Images/sm-logo.png" alt="SuppliMax" className="h-10 w-auto" />
+        </Link>
+        <div className="flex space-x-3">
+          <Search className="w-6 h-6 text-gray-600" />
+
+          <Heart className="w-6 h-6 text-gray-600" />
+
+
+          <ShoppingCart className="w-6 h-6 text-gray-600" />
+
+          {isAuthenticated ? (
+            <Link href="/account">
+              <div className="w-6 h-6 bg-[#629D23] rounded-full flex items-center justify-center text-white text-xs font-bold">
+                {user ? getUserInitials(user.name) : 'U'}
+              </div>
+            </Link>
+          ) : (
+            <button onClick={() => setShowAuthModal(true)}>
+              <User className="w-6 h-6 text-gray-600" />
+            </button>
+          )}
+        </div>
       </div>
     </>
   );

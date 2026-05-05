@@ -23,8 +23,7 @@ interface Product {
 }
 
 // ✅ Environment Variable se URL uthayen, warna local use karein
-const API_BASE_URL = 'https://supplimax-back-production.up.railway.app';
-//const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+import { API_BASE_URL } from '@/config';
 
 async function getProduct(productId: string): Promise<Product | null> {
   try {

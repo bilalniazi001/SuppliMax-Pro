@@ -1,26 +1,32 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
+import { MySql2Database } from 'drizzle-orm/mysql2';
 import { DRIZZLE } from '../../db/db.module';
 import * as schema from '../../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(DRIZZLE) private db: NodePgDatabase<typeof schema>,
+    @Inject(DRIZZLE) private db: MySql2Database<typeof schema>,
   ) {}
 
   async findByEmail(email: string) {
-    console.log('🔍 Searching user by email:', email);
-    const [user] = await this.db.select().from(schema.users).where(eq(schema.users.email, email)).limit(1);
+    const normalizedEmail = email.trim().toLowerCase();
+    console.log('🔍 Searching user by email (case-insensitive):', normalizedEmail);
+    const [user] = await this.db.select().from(schema.users).where(eq(sql`LOWER(${schema.users.email})`, normalizedEmail)).limit(1);
     console.log('📋 User found:', user ? user.email : 'None');
     return user;
   }
 
   async create(userData: any) {
     console.log('➕ Creating new user:', userData.email);
-    const [newUser] = await this.db.insert(schema.users).values(userData).returning();
-    return newUser;
+    const userId = userData.id || crypto.randomUUID();
+    await this.db.insert(schema.users).values({
+      ...userData,
+      id: userId,
+    });
+    return await this.findByEmail(userData.email);
   }
 
   async findById(id: string) {
@@ -51,5 +57,58 @@ export class UsersService {
     }
     console.log('👑 Admin user already exists');
     return existingAdmin;
+  }
+
+  async findAll() {
+    try {
+      console.log('👥 Fetching all users...');
+      return await this.db.select().from(schema.users);
+    } catch (error) {
+      console.error('❌ [BACKEND] Error fetching all users:', error);
+      throw new BadRequestException(`Failed to fetch users: ${error.message}`);
+    }
+  }
+
+  async findAllAdmins() {
+    console.log('👥 Fetching all admin users...');
+    return await this.db.select().from(schema.users).where(eq(schema.users.role, 'admin'));
+  }
+
+  async update(id: string, data: any) {
+    console.log('📝 Updating user:', id);
+    await this.db
+      .update(schema.users)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(schema.users.id, id));
+    return await this.findById(id);
+  }
+
+  async delete(id: string) {
+    console.log('🗑️ Deleting user:', id);
+    return await this.db.delete(schema.users).where(eq(schema.users.id, id));
+  }
+
+  async changePassword(id: string, cnic: string, phone: string, newPassword: string) {
+    console.log('🔐 Change password request for user:', id);
+    
+    // Verify CNIC and Phone
+    const [user] = await this.db
+      .select()
+      .from(schema.users)
+      .where(eq(schema.users.id, id))
+      .limit(1);
+
+    if (!user) throw new Error('User not found');
+    
+    if (user.cnic !== cnic || user.phone !== phone) {
+      throw new Error('Verification failed. CNIC or Phone number is incorrect.');
+    }
+
+    await this.db
+      .update(schema.users)
+      .set({ password: newPassword, updatedAt: new Date() })
+      .where(eq(schema.users.id, id));
+      
+    return await this.findById(id);
   }
 }

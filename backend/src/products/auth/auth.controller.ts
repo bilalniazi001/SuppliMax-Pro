@@ -71,4 +71,26 @@ export class AuthController {
       timestamp: new Date().toISOString()
     };
   }
+
+  @Post('google')
+  async googleLogin(@Body() body: { token: string }) {
+    try {
+      console.log('🔵 Google login API called');
+      return await this.authService.googleLogin(body.token);
+    } catch (error) {
+      console.error('❌ Google login error:', error.message);
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+    }
+  }
+
+  @Post('google-access')
+  async googleAccessLogin(@Body() body: { access_token: string; email: string; name: string; sub: string }) {
+    try {
+      console.log('🔵 Google access token login called for:', body.email);
+      return await this.authService.googleAccessLogin(body);
+    } catch (error) {
+      console.error('❌ Google access login error:', error.message);
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+    }
+  }
 }

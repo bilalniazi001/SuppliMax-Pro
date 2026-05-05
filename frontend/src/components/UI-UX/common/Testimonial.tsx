@@ -82,7 +82,6 @@ const TestimonialCard: React.FC<{ review: Review }> = ({ review }) => {
 
 
 export default function TestimonialSection() {
-  
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -94,7 +93,7 @@ export default function TestimonialSection() {
   };
 
   const itemVariants: Variants = {
-    hidden: { y: 50, opacity: 0 },
+    hidden: { y: 30, opacity: 0 },
     visible: {
         y: 0,
         opacity: 1,
@@ -107,39 +106,36 @@ export default function TestimonialSection() {
   };
   
   return (
-    <section className="bg-gray-900 relative overflow-hidden py-16 md:py-24">
-      
-      <div className="absolute inset-0 z-0 opacity-10" style={{ backgroundImage: 'linear-gradient(to bottom, #440000, #000000)' }}>
-      </div>
-
+    <section className="bg-white relative overflow-hidden py-16 md:py-24 border-t border-gray-100">
       <div className="container mx-auto px-4 relative z-10">
         
-        <div className="text-center text-white mb-12 md:text-left md:flex justify-between items-end">
-          
-          <div className="mb-6 md:mb-0">
-            <p className="text-sm font-semibold uppercase tracking-widest text-red-600 mb-2">TESTIMONIALS</p>
-            <h2 className="text-3xl md:text-4xl font-bold leading-none">
-              Real Reviews From <br />Real Customers
-            </h2>
-          </div>
-          
-          <div className="text-right">
-            <p className="text-lg font-bold text-green-500 mb-1">Excellent</p>
-            <StarRating rating={5} size={6} />
-            <p className="text-sm text-gray-400 mt-1">Based on 1,296 reviews</p>
-          </div>
+        <div className="text-center mb-16">
+          <p className="text-[#629D23] font-bold uppercase tracking-widest mb-2 text-sm">Testimonials</p>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 uppercase">
+            What Our Customers Say
+          </h2>
+          <div className="w-16 h-1 bg-[#629D23] mx-auto mt-4"></div>
         </div>
 
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible" 
           viewport={{ once: true, amount: 0.2 }}
         >
           {TESTIMONIALS_DATA.map((review) => (
-            <motion.div key={review.id} variants={itemVariants}>
-              <TestimonialCard review={review} />
+            <motion.div key={review.id} variants={itemVariants} className="flex flex-col items-center text-center">
+              <div className="mb-4">
+                <StarRating rating={review.rating} size={5} />
+              </div>
+              <blockquote className="text-lg text-gray-600 italic leading-relaxed mb-6">
+                "{review.text}"
+              </blockquote>
+              <div className="mt-auto">
+                <p className="text-base font-extrabold text-gray-900 uppercase">{review.author}</p>
+                <p className="text-xs font-bold text-[#629D23] uppercase tracking-widest mt-1">{review.source}</p>
+              </div>
             </motion.div>
           ))}
         </motion.div>

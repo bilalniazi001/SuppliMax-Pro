@@ -94,7 +94,7 @@ export default function ExclusiveItems({ initialData }: ExclusiveItemsProps) {
                 {largeItem.name}
               </h3>
               <p className="text-lg md:text-xl font-bold text-yellow-400 mb-6">
-                ${largeItem.price.toFixed(2)}
+                {largeItem.price.toFixed(2)} Rs
               </p>
               <a
                 href={`/product`}
@@ -133,7 +133,7 @@ export default function ExclusiveItems({ initialData }: ExclusiveItemsProps) {
                     {smallItem1.name}
                   </h3>
                   <p className="text-lg font-bold text-yellow-400 mb-4">
-                    ${smallItem1.price.toFixed(2)}
+                    {smallItem1.price.toFixed(2)} Rs
                   </p>
                   
                   <a
@@ -178,7 +178,7 @@ export default function ExclusiveItems({ initialData }: ExclusiveItemsProps) {
                     {smallItem2.name}
                   </h3>
                   <p className="text-lg font-bold text-yellow-400 mb-4">
-                    ${smallItem2.price.toFixed(2)}
+                    {smallItem2.price.toFixed(2)} Rs
                   </p>
                   
                   <a

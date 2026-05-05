@@ -3,16 +3,17 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { FiLayout, FiPackage, FiUsers, FiSettings, FiLogOut } from 'react-icons/fi';
+import { FiLayout, FiPackage, FiUsers, FiSettings, FiLogOut, FiShield } from 'react-icons/fi';
 import { AiOutlineShoppingCart, AiOutlineDollar, AiOutlineCodeSandbox } from "react-icons/ai";
 import { BiBuoy, BiMessageAltDetail } from "react-icons/bi";
 
 const navItems = [
-  { href: '/dashboard', icon: FiLayout, label: 'Dashboard' },
-  { href: '/products', icon: FiPackage, label: 'Products' },
+  { href: '/admin/dashboard', icon: FiLayout, label: 'Dashboard' },
+  { href: '/admin', icon: FiPackage, label: 'Products' },
   { href: '/admin/users', icon: FiUsers, label: 'Users' },
   { href: '/admin/settings', icon: FiSettings, label: 'Settings' },
   { href: '/admin/order', icon: AiOutlineShoppingCart, label: 'Order' },
+  { href: '/admin/admins', icon: FiShield, label: 'Admins' },
   { href: '/admin/brand', icon: BiBuoy, label: 'Brand' },
   { href: '/admin/transaction', icon: AiOutlineDollar, label: 'Transaction' },
   { href: '/admin/vendor', icon: AiOutlineCodeSandbox, label: 'Vendor' },

@@ -93,7 +93,7 @@ export default function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProp
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#629D23] focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#629D23] focus:border-transparent text-[#2D3B29] placeholder:text-[#2D3B29]/70"
                   placeholder="admin@supplimax.com"
                 />
               </div>
@@ -110,7 +110,7 @@ export default function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProp
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#629D23] focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#629D23] focus:border-transparent text-[#2D3B29] placeholder:text-[#2D3B29]/70"
                   placeholder="Enter admin password"
                 />
               </div>

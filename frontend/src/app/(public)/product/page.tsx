@@ -4,6 +4,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { ChevronDown, Loader2, Star, Filter, SlidersHorizontal, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { useCart } from '@/context/CartContext';
+import { useWishlist } from '@/context/WishlistContext';
 import AuthModal from '@/components/AuthModal';
 
 // UPDATED: id string type ki hai
@@ -23,39 +25,47 @@ interface Filters {
 }
 
 const fetchProducts = async (): Promise<Product[]> => {
-  
-  
-  
+
+
+
   try {
-    const response = await fetch(API_BASE_URL);
-    
+    const response = await fetch(`${API_BASE_URL}/products`);
+
     if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`API can't fetch data. Status: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`API can't fetch data. Status: ${response.status}`);
     }
 
-    const data: any[] = await response.json();
-    
+    const result = await response.json();
+
     // DEBUG: Raw API response check karein
-    console.log(' [PRODUCT LIST] Raw API response:', data);
-    
+    console.log(' [PRODUCT LIST] Raw API response:', result);
+
+    // ✅ Handle object with numeric keys or direct array
+    let data: any[] = [];
+    if (Array.isArray(result)) {
+      data = result;
+    } else if (result && typeof result === 'object') {
+      data = Object.values(result).filter(p => p && typeof p === 'object');
+    }
+
     // PROPERLY MAP DATA with ID validation
     const mappedProducts = data.map((item, index) => {
       // Pehle item.id check karein, phir item._id, phir temporary ID
       const productId = item.id || item._id?.toString() || `temp-${index + 1}`;
-      
+
       console.log(` [PRODUCT LIST] Mapping product ${index}:`, {
         name: item.name,
         originalId: item.id,
         mongoId: item._id,
         finalId: productId
       });
-      
+
       //  ID validation - agar ID invalid hai toh skip karein
       if (!productId || productId === 'undefined' || productId.includes('temp-')) {
         console.warn(` [PRODUCT LIST] Invalid ID for product: ${item.name}`, productId);
       }
-      
+
       return {
         id: productId, //  Ensure ID is string
         name: item.name || 'Unnamed Product',
@@ -70,17 +80,37 @@ const fetchProducts = async (): Promise<Product[]> => {
     return mappedProducts;
   } catch (error) {
     console.error("Data fetch error:", error);
-    return []; 
+    return [];
   }
 };
 
 //  UPDATED: ProductCard component with ID validation
-const ProductCard: React.FC<{ 
+const ProductCard: React.FC<{
   product: Product;
   onAddToCart: (product: Product) => void;
   showAuthModal: () => void;
 }> = ({ product, onAddToCart, showAuthModal }) => {
   const { isAuthenticated } = useAuth();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { addToCart } = useCart();
+
+  const isFavorited = isInWishlist(product.id);
+
+  const toggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      showAuthModal();
+      return;
+    }
+
+    if (isFavorited) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
+  };
 
   //  ID validation check
   const isValidProduct = product.id && product.id !== 'undefined' && !product.id.includes('temp-');
@@ -89,12 +119,12 @@ const ProductCard: React.FC<{
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!isAuthenticated) {
       showAuthModal();
       return;
     }
-    
+
     onAddToCart(product);
   };
 
@@ -109,39 +139,41 @@ const ProductCard: React.FC<{
   };
 
   return (
-    <Link 
-      href={productUrl}
-      onClick={handleProductClick}
-      className={`block ${!isValidProduct ? 'cursor-not-allowed opacity-70' : ''}`}
-    >
-      <div className="bg-white p-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group border border-gray-100 cursor-pointer">
+    <div className={`block ${!isValidProduct ? 'cursor-not-allowed opacity-70' : ''}`}>
+      <div className="bg-white p-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group border border-gray-100 relative">
         {/*  Image container - Size adjusted */}
-        <div className="relative w-full h-40 mb-4 overflow-hidden bg-white rounded-lg flex items-center justify-center p-4">
-            <img 
-                src={product.imageUrl} 
-                alt={product.name} 
-                className="max-w-full max-h-32 object-contain transition-transform duration-500 group-hover:scale-105"
-                onError={(e) => {
-                    e.currentTarget.src = `https://placehold.co/400x300/4f46e5/ffffff?text=${product.name.substring(0, 15)}`;
-                }}
-            />
-            <span className="absolute top-2 left-2 px-2 py-1 text-xs font-semibold text-white bg-[#629D23] rounded-full shadow-md">
-                {product.category}
-            </span>
-            
-            {/*  Show warning for invalid products */}
-            {!isValidProduct && (
-              <span className="absolute top-2 right-2 px-2 py-1 text-xs font-semibold text-white bg-red-600 rounded-full shadow-md">
-                NO ID
-              </span>
-            )}
-        </div>
+        <Link href={productUrl} onClick={handleProductClick} className="relative w-full h-40 mb-4 overflow-hidden bg-white rounded-lg flex items-center justify-center p-4">
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            className="max-w-full max-h-32 object-contain transition-transform duration-500 group-hover:scale-105"
+            onError={(e) => {
+              e.currentTarget.src = `https://placehold.co/400x300/4f46e5/ffffff?text=${product.name.substring(0, 15)}`;
+            }}
+          />
+        </Link>
         
-        <h3 className="text-lg font-bold text-[#2D3B29] mb-1 truncate">{product.name}</h3>
-        
+        <Link href={`/shop/${product.category}`}>
+          <span className="absolute top-6 left-6 px-2 py-1 text-[10px] font-bold text-white bg-[#629D23] rounded-full shadow-md z-10 hover:bg-lime-700 transition-colors cursor-pointer">
+            {product.category}
+          </span>
+        </Link>
+
+        {/* Wishlist Toggle */}
+        <button
+          onClick={toggleWishlist}
+          className={`absolute top-6 right-6 p-1.5 rounded-full shadow-md transition-all duration-300 z-10 ${isFavorited ? 'bg-red-50 text-red-500' : 'bg-white text-gray-400 hover:text-red-400'}`}
+        >
+          <Star size={16} fill={isFavorited ? "currentColor" : "none"} />
+        </button>
+
+        <Link href={productUrl} onClick={handleProductClick}>
+          <h3 className="text-lg font-bold text-[#2D3B29] mb-1 truncate hover:text-[#629D23] transition-colors">{product.name}</h3>
+        </Link>
+
         <div className="flex items-center justify-between mb-3">
           <p className="text-xl font-extrabold text-lime-600">
-            ${product.price.toFixed(2)}
+            {product.price.toFixed(2)} Rs
           </p>
           <div className="flex items-center text-yellow-500">
             <Star size={14} fill="currentColor" className="mr-1" />
@@ -149,7 +181,7 @@ const ProductCard: React.FC<{
           </div>
         </div>
 
-        <button 
+        <button
           className="w-full bg-[#629D23] text-white py-2 rounded-lg font-semibold text-sm hover:bg-lime-700 transition-colors duration-300"
           onClick={handleAddToCart}
         >
@@ -158,7 +190,7 @@ const ProductCard: React.FC<{
 
         {/* Invalid product overlay */}
         {!isValidProduct && (
-          <div className="absolute inset-0 bg-red-50 bg-opacity-80 flex items-center justify-center rounded-xl">
+          <div className="absolute inset-0 bg-red-50 bg-opacity-80 flex items-center justify-center rounded-xl z-20">
             <div className="text-center p-4">
               <AlertTriangle className="w-8 h-8 text-red-600 mx-auto mb-2" />
               <p className="text-red-600 font-semibold text-sm">Product Not Available</p>
@@ -166,7 +198,7 @@ const ProductCard: React.FC<{
           </div>
         )}
       </div>
-    </Link>
+    </div>
   );
 };
 
@@ -177,16 +209,17 @@ const ProductList: React.FC = () => {
   const [isApiError, setIsApiError] = useState(false);
   const [sortOption, setSortOption] = useState<'price_asc' | 'price_desc' | 'rating_desc' | 'default'>('default');
   const [showAuthModal, setShowAuthModal] = useState(false);
-  
+
   //  Filters mein category add kiya
   const [filters, setFilters] = useState<Filters>({
     category: 'all',
     minPrice: 0,
-    maxPrice: 500, 
+    maxPrice: 500,
   });
-  
+
   const [maxAvailablePrice, setMaxAvailablePrice] = useState(500);
 
+  const { addToCart } = useCart();
   const { isAuthenticated, user } = useAuth();
 
   // --- Data Fetching Effect ---
@@ -202,7 +235,7 @@ const ProductList: React.FC = () => {
         } else {
           setIsApiError(false);
           setProducts(data);
-          
+
           const maxPrice = Math.max(...data.map(p => p.price), 100);
           const roundedMaxPrice = Math.ceil(maxPrice / 100) * 100;
           setMaxAvailablePrice(roundedMaxPrice);
@@ -256,13 +289,13 @@ const ProductList: React.FC = () => {
     const name = e.target.name;
 
     setFilters(prev => {
-        if (name === 'minPrice' && value > prev.maxPrice) {
-            return { ...prev, minPrice: value, maxPrice: value };
-        }
-        if (name === 'maxPrice' && value < prev.minPrice) {
-            return { ...prev, minPrice: value, maxPrice: value };
-        }
-        return { ...prev, [name]: value };
+      if (name === 'minPrice' && value > prev.maxPrice) {
+        return { ...prev, minPrice: value, maxPrice: value };
+      }
+      if (name === 'maxPrice' && value < prev.minPrice) {
+        return { ...prev, minPrice: value, maxPrice: value };
+      }
+      return { ...prev, [name]: value };
     });
   };
 
@@ -275,16 +308,8 @@ const ProductList: React.FC = () => {
     setSortOption(e.target.value as typeof sortOption);
   };
 
-  //  Add to Cart Handler with Authentication Check
   const handleAddToCart = (product: Product) => {
-    if (!isAuthenticated) {
-      setShowAuthModal(true);
-      return;
-    }
-    
-    // Add to cart logic for authenticated users
-    alert(`Added ${product.name} to cart!`);
-    // Yahan aap actual cart logic implement kar sakte hain
+    addToCart(product);
   };
 
   //  Show Auth Modal Handler
@@ -293,10 +318,10 @@ const ProductList: React.FC = () => {
   };
 
   //  Debug: Count valid vs invalid products
-  const validProductsCount = filteredAndSortedProducts.filter(p => 
+  const validProductsCount = filteredAndSortedProducts.filter(p =>
     p.id && p.id !== 'undefined' && !p.id.includes('temp-')
   ).length;
-  
+
   const invalidProductsCount = filteredAndSortedProducts.length - validProductsCount;
 
   if (isLoading) {
@@ -325,9 +350,9 @@ const ProductList: React.FC = () => {
   return (
     <>
       {/* Auth Modal */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
       />
 
       <div className="min-h-screen bg-gray-50 p-4 sm:p-8 lg:p-12 font-sans">
@@ -338,39 +363,16 @@ const ProductList: React.FC = () => {
           <p className="text-xl text-[#629D23] font-medium">
             Supplements For Everyone
           </p>
-
-          {/* Welcome Message for Authenticated Users */}
-          {isAuthenticated && user && (
-            <div className="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg max-w-md mx-auto">
-              Welcome back, <strong>{user.name}</strong>!  Happy shopping!
-            </div>
-          )}
-
-          {/* Login Prompt for Non-Authenticated Users */}
-          {!isAuthenticated && (
-            <div className="mt-4 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded-lg max-w-md mx-auto">
-              <strong>Login required!</strong> Please login to add items to cart.
-            </div>
-          )}
         </header>
 
         <div className="lg:flex gap-10">
-          
+
           {/* --- Filters Sidebar (Left Column) --- */}
           <aside className="lg:w-1/4 mb-8 lg:mb-0 p-6 bg-white rounded-2xl shadow-xl sticky top-8 h-fit transition-all duration-300">
             <h2 className="text-2xl font-bold text-[#2D3B29] mb-6 flex items-center border-b pb-3">
               <Filter size={20} className="mr-2 text-[#629D23]" />
               Filters
             </h2>
-
-            {/* Product Status Info */}
-            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-sm text-yellow-700">
-                <strong>Products Status:</strong><br/>
-                Valid: <strong>{validProductsCount}</strong><br/>
-                Invalid: <strong>{invalidProductsCount}</strong>
-              </p>
-            </div>
 
             {/* Category Filter - Dynamically */}
             <div className="mb-6">
@@ -379,11 +381,10 @@ const ProductList: React.FC = () => {
                 <button
                   key={cat}
                   onClick={() => handleCategoryChange(cat)}
-                  className={`w-full text-left py-2 px-4 rounded-lg mb-2 transition-all duration-200 ${
-                    filters.category === cat
+                  className={`w-full text-left py-2 px-4 rounded-lg mb-2 transition-all duration-200 ${filters.category === cat
                       ? 'bg-[#629D23] text-white font-bold shadow-md transform scale-[1.01]'
                       : 'bg-gray-100 text-[#2D3B29] hover:bg-lime-100 hover:text-lime-700'
-                  }`}
+                    }`}
                 >
                   {cat === 'all' ? 'All Categories' : cat}
                 </button>
@@ -393,40 +394,40 @@ const ProductList: React.FC = () => {
             {/* Price Range Filter */}
             <div className="mb-6 border-t pt-4">
               <h3 className="text-lg font-semibold text-[#2D3B29] mb-4 flex items-center">
-                  <SlidersHorizontal size={18} className="mr-2 text-lime-500"/>
-                  Price Range
+                <SlidersHorizontal size={18} className="mr-2 text-lime-500" />
+                Price Range
               </h3>
-              
+
               <div className="mb-4">
-                  <label className="block text-sm font-medium text-[#2D3B29] mb-1">
-                      Minimum Price: ${filters.minPrice.toFixed(2)}
-                  </label>
-                  <input
-                      type="range"
-                      name="minPrice"
-                      min="0"
-                      max={maxAvailablePrice}
-                      step="5"
-                      value={filters.minPrice}
-                      onChange={handlePriceRangeChange}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg accent-lime-600"
-                  />
+                <label className="block text-sm font-medium text-[#2D3B29] mb-1">
+                  Minimum Price: {filters.minPrice.toFixed(2)} Rs
+                </label>
+                <input
+                  type="range"
+                  name="minPrice"
+                  min="0"
+                  max={maxAvailablePrice}
+                  step="5"
+                  value={filters.minPrice}
+                  onChange={handlePriceRangeChange}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg accent-lime-600"
+                />
               </div>
-              
+
               <div>
-                  <label className="block text-sm font-medium text-[#2D3B29] mb-1">
-                      Maximum Price: ${filters.maxPrice.toFixed(2)}
-                  </label>
-                  <input
-                      type="range"
-                      name="maxPrice"
-                      min="0"
-                      max={maxAvailablePrice}
-                      step="5"
-                      value={filters.maxPrice}
-                      onChange={handlePriceRangeChange}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg accent-lime-600"
-                  />
+                <label className="block text-sm font-medium text-[#2D3B29] mb-1">
+                  Maximum Price: {filters.maxPrice.toFixed(2)} Rs
+                </label>
+                <input
+                  type="range"
+                  name="maxPrice"
+                  min="0"
+                  max={maxAvailablePrice}
+                  step="5"
+                  value={filters.maxPrice}
+                  onChange={handlePriceRangeChange}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg accent-lime-600"
+                />
               </div>
             </div>
           </aside>
@@ -437,10 +438,7 @@ const ProductList: React.FC = () => {
             <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-xl shadow-md border border-gray-100">
               <div>
                 <p className="text-lg font-medium text-[#2D3B29]">
-                  <span className="font-bold text-lime-600">{validProductsCount}</span> Valid Products found
-                  {invalidProductsCount > 0 && (
-                    <span className="ml-2 text-red-500">({invalidProductsCount} invalid)</span>
-                  )}
+                  Showing <span className="font-bold text-lime-600">{validProductsCount}</span> products
                   {filters.category !== 'all' && (
                     <span className="ml-2 text-lime-500">in {filters.category}</span>
                   )}
@@ -471,9 +469,9 @@ const ProductList: React.FC = () => {
                 {filteredAndSortedProducts
                   .filter(product => product.id && product.id !== 'undefined' && !product.id.includes('temp-'))
                   .map(product => (
-                    <ProductCard 
-                      key={product.id} 
-                      product={product} 
+                    <ProductCard
+                      key={product.id}
+                      product={product}
                       onAddToCart={handleAddToCart}
                       showAuthModal={handleShowAuthModal}
                     />
@@ -485,8 +483,8 @@ const ProductList: React.FC = () => {
                   No valid products found.
                 </p>
                 <p className="text-md text-[#2D3B29] mt-2">
-                  {invalidProductsCount > 0 ? 
-                    `${invalidProductsCount} products have invalid IDs. Check backend data.` : 
+                  {invalidProductsCount > 0 ?
+                    `${invalidProductsCount} products have invalid IDs. Check backend data.` :
                     'Adjust your filters and try again.'
                   }
                 </p>
@@ -500,5 +498,5 @@ const ProductList: React.FC = () => {
 };
 
 export default function ProductsPage() {
-    return <ProductList />;
+  return <ProductList />;
 }

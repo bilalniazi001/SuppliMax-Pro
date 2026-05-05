@@ -76,7 +76,7 @@ export default function ProductList({ products }: ProductListProps) {
       {products.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-gray-500 mb-4">Your inventory is empty.</p>
-          <Link href="/products/add" className="bg-[#629D23] text-white px-6 py-2 rounded-lg hover:bg-[#4c781d] transition">
+          <Link href="/admin/products/add" className="bg-[#629D23] text-white px-6 py-2 rounded-lg hover:bg-[#4c781d] transition">
             + Add Product
           </Link>
         </div>
@@ -101,13 +101,13 @@ export default function ProductList({ products }: ProductListProps) {
                     <div className="flex items-center">
                       <img src={product.imageUrl || '/placeholder.png'} alt="" className="w-12 h-12 rounded object-cover mr-3 border" />
                       <div>
-                        <div className="text-sm font-bold text-gray-900">{product.name}</div>
+                        <div className="text-sm font-bold text-[#2D3B29]">{product.name}</div>
                         <div className="text-xs text-gray-500">{product.category}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-4 text-center text-sm font-mono font-semibold">
-                    ${product.price.toFixed(2)}
+                  <td className="px-4 py-4 text-center text-lg font-black text-[#2D3B29]">
+                    Rs. {product.price.toLocaleString()}
                   </td>
                   <td className="px-4 py-4 text-center">
                     <span className={`px-2 py-1 text-xs rounded-full font-bold ${product.quantityInStock > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
@@ -121,19 +121,23 @@ export default function ProductList({ products }: ProductListProps) {
                       <span className="text-gray-400 text-xs">Standard</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-center space-x-2">
-                    <Link 
-                      href={`/products/edit/${pid}`}
-                      className="inline-block text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-600 px-3 py-1 rounded transition text-sm font-bold"
-                    >
-                      Edit
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(product)}
-                      className="text-red-600 hover:bg-red-600 hover:text-white border border-red-600 px-3 py-1 rounded transition text-sm font-bold"
-                    >
-                      Delete
-                    </button>
+                  <td className="px-6 py-4 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <Link 
+                        href={`/admin/products/edit/${pid}`}
+                        className="relative overflow-hidden inline-flex items-center justify-center bg-[#629D23] text-white hover:bg-[#4c781d] px-6 py-2 rounded-xl transition-all duration-300 text-sm font-bold shadow-md hover:shadow-lg group min-w-[80px]"
+                      >
+                        <span className="relative z-10">Edit</span>
+                        <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(product)}
+                        className="relative overflow-hidden inline-flex items-center justify-center bg-[#2D3B29] text-white hover:bg-black px-6 py-2 rounded-xl transition-all duration-300 text-sm font-bold shadow-md hover:shadow-lg group min-w-[80px]"
+                      >
+                        <span className="relative z-10">Delete</span>
+                        <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );

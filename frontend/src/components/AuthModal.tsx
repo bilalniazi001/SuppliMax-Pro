@@ -3,6 +3,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { X, Mail, Lock, User, Phone, MapPin, Calendar, Hash } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+// Dynamically import GoogleSignInButton so it only loads inside GoogleOAuthProvider
+const GoogleSignInButton = dynamic(() => import('./GoogleSignInButton'), { ssr: false });
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -33,8 +37,51 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     cnic: ''
   });
 
-  const { login, signup } = useAuth();
+  const { login, signup, googleLogin } = useAuth();
   const modalRef = useRef<HTMLDivElement>(null);
+
+  // Whether Google OAuth is configured
+  const isGoogleConfigured = !!(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && 
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID_HERE');
+
+  // Google login success handler
+  const handleGoogleSuccess = async (tokenResponse: any) => {
+    setLoading(true);
+    setError('');
+    try {
+      const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+      });
+      const userInfo = await userInfoRes.json();
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/auth/google-access`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          access_token: tokenResponse.access_token,
+          email: userInfo.email,
+          name: userInfo.name,
+          sub: userInfo.sub,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user_data', JSON.stringify(data.user));
+        onClose();
+        window.location.reload();
+      } else {
+        setError('Google login failed. Please try again.');
+      }
+    } catch (err) {
+      setError('Google login error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => setError('Google login was cancelled or failed.');
 
   // Body overflow hidden when modal is open
   useEffect(() => {
@@ -109,7 +156,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setLoading(true);
 
     try {
-      const success = await signup(signupData);
+      const success = await signup({
+        ...signupData,
+        age: parseInt(signupData.age) || 0
+      });
       if (success) {
         onClose();
         setSignupData({
@@ -275,6 +325,23 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               >
                 {loading ? 'Signing In...' : 'Sign In to Your Account'}
               </button>
+
+              {/* Google Sign-In */}
+              {isGoogleConfigured && (
+                <>
+                  <div className="relative flex items-center">
+                    <div className="flex-grow border-t border-gray-200"></div>
+                    <span className="mx-3 text-sm text-gray-400 font-medium">OR</span>
+                    <div className="flex-grow border-t border-gray-200"></div>
+                  </div>
+                  <GoogleSignInButton
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    loading={loading}
+                    label="Continue with Google"
+                  />
+                </>
+              )}
 
               <div className="text-center">
                 <p className="text-sm text-gray-600">
@@ -510,6 +577,23 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               >
                 {loading ? 'Creating Account...' : 'Create Your Account'}
               </button>
+
+              {/* Google Sign-Up */}
+              {isGoogleConfigured && (
+                <>
+                  <div className="relative flex items-center">
+                    <div className="flex-grow border-t border-gray-200"></div>
+                    <span className="mx-3 text-sm text-gray-400 font-medium">OR</span>
+                    <div className="flex-grow border-t border-gray-200"></div>
+                  </div>
+                  <GoogleSignInButton
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    loading={loading}
+                    label="Sign Up with Google"
+                  />
+                </>
+              )}
 
               <div className="text-center">
                 <p className="text-sm text-gray-600">

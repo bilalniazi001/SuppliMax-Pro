@@ -5,6 +5,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; 
 import { Heart, Eye, ShoppingBag, Star } from 'lucide-react';
 import Link from 'next/link';
+import { useCart } from '@/context/CartContext';
+import { useWishlist } from '@/context/WishlistContext';
 
 // --- TYPE DEFINITIONS & API CONFIG ---
 interface ProductItem {
@@ -45,12 +47,27 @@ const ProductCard: React.FC<{ product: ProductItem; variants: any }> = ({ produc
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   
+  const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+
+  const isFavorited = isInWishlist(product.id);
+
+  const toggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isFavorited) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product as any);
+    }
+  };
+  
   const getProductId = () => product.id || product._id || `temp-${Math.random().toString(36).substr(2, 9)}`;
 
   const getProductUrl = () => {
     const productId = getProductId();
-    // ✅ Yahan check karein ke route plural hy ya singular (products vs product)
-    return productId && !productId.toString().includes('temp-') ? `/products/${productId}` : '#';
+    // ✅ Change route from /products/ to /product/
+    return productId && !productId.toString().includes('temp-') ? `/product/${productId}` : '#';
   };
 
   const oldPrice = product.discountPercentage > 0 
@@ -80,11 +97,11 @@ const ProductCard: React.FC<{ product: ProductItem; variants: any }> = ({ produc
       {/* IMAGE CONTAINER */}
       <div className="relative h-64 w-full overflow-hidden bg-white flex items-center justify-center p-4">
         <img
-          src={product.imageUrl || '/placeholder-image.jpg'}
+          src={imageError || !product.imageUrl ? 'https://images.unsplash.com/photo-1583454110551-21f2fa2ec617?w=800&auto=format&fit=crop&q=60' : product.imageUrl}
           alt={product.name}
           className={`max-w-full max-h-48 object-contain transition-all duration-500 ease-in-out ${
             imageLoaded ? 'group-hover:opacity-70' : 'opacity-0'
-          } ${imageError ? 'hidden' : ''}`}
+          }`}
           onLoad={() => setImageLoaded(true)}
           onError={() => setImageError(true)}
         />
@@ -96,8 +113,11 @@ const ProductCard: React.FC<{ product: ProductItem; variants: any }> = ({ produc
             animate={isHovered ? { y: 0, opacity: 1 } : { y: -20, opacity: 0 }}
             className="flex space-x-3"
           >
-            <button className="p-3 bg-white rounded-full shadow-lg hover:bg-red-50 transform hover:scale-110">
-              <Heart size={20} className="text-gray-700 hover:text-red-500 transition-colors" />
+            <button 
+              onClick={toggleWishlist}
+              className={`p-3 rounded-full shadow-lg transform hover:scale-110 transition-all ${isFavorited ? 'bg-red-50 text-red-500' : 'bg-white text-gray-700 hover:bg-red-50 hover:text-red-500'}`}
+            >
+              <Heart size={20} fill={isFavorited ? "currentColor" : "none"} />
             </button>
             
             {productUrl !== '#' ? (
@@ -118,14 +138,18 @@ const ProductCard: React.FC<{ product: ProductItem; variants: any }> = ({ produc
 
       {/* Product Info */}
       <div className="p-4 text-center">
-        <p className="text-xs uppercase tracking-widest text-gray-500 mb-1">{product.category}</p>
+        <Link href={`/shop/${product.category}`}>
+          <p className="text-xs uppercase tracking-widest text-[#629D23] font-bold mb-1 hover:underline cursor-pointer inline-block">
+            {product.category}
+          </p>
+        </Link>
         <h3 className="text-lg font-semibold text-gray-900 mb-2 truncate">{product.name}</h3>
         <div className="flex justify-center items-center mb-2">
           {stars} <span className="text-sm text-gray-500 ml-1">({product.rating})</span>
         </div>
         <div className="flex justify-center items-center space-x-2">
-          <span className={`text-xl font-bold ${oldPrice ? 'text-red-600' : 'text-gray-900'}`}>${product.price.toFixed(2)}</span>
-          {oldPrice && <span className="text-sm text-gray-500 line-through">${oldPrice.toFixed(2)}</span>}
+          <span className={`text-xl font-bold ${oldPrice ? 'text-red-600' : 'text-gray-900'}`}>{product.price.toFixed(2)} Rs</span>
+          {oldPrice && <span className="text-sm text-gray-500 line-through">{oldPrice.toFixed(2)} Rs</span>}
         </div>
       </div>
       
@@ -136,7 +160,7 @@ const ProductCard: React.FC<{ product: ProductItem; variants: any }> = ({ produc
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 50, opacity: 0 }}
             className="w-full bg-[#2D3B29] text-white py-3 flex items-center justify-center font-semibold text-sm hover:bg-[#4c781d]"
-            onClick={(e) => { e.preventDefault(); alert(`Added ${product.name} to cart!`); }}
+            onClick={(e) => { e.preventDefault(); addToCart(product as any); }}
           >
             <ShoppingBag size={18} className="mr-2" /> Add to Cart
           </motion.button>
@@ -160,9 +184,17 @@ export default function FeaturedProducts() {
         const res = await fetch(FETCH_URL);
         if (!res.ok) throw new Error(`Status: ${res.status}`);
         
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          setProducts(data.map((item: any, index: number) => ({
+        const result = await res.json();
+        
+        let rawProducts: any[] = [];
+        if (Array.isArray(result)) {
+          rawProducts = result;
+        } else if (result && typeof result === 'object') {
+          rawProducts = Object.values(result).filter(p => p && typeof p === 'object');
+        }
+
+        if (rawProducts.length > 0) {
+          setProducts(rawProducts.map((item: any, index: number) => ({
             id: item.id || item._id?.toString() || `temp-${index + 1}`,
             _id: item._id,
             name: item.name || 'Unnamed Product',

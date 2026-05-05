@@ -1,7 +1,7 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
+import { drizzle } from 'drizzle-orm/mysql2';
+import * as mysql from 'mysql2/promise';
 import * as schema from './schema';
 
 export const DRIZZLE = 'DRIZZLE';
@@ -14,10 +14,28 @@ export const DRIZZLE = 'DRIZZLE';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
         const databaseUrl = configService.get<string>('DATABASE_URL');
-        const pool = new Pool({
-          connectionString: databaseUrl,
+        if (!databaseUrl) {
+          throw new Error('DATABASE_URL is not defined in environment variables');
+        }
+
+        console.log('📡 [DATABASE] Connecting to TiDB Cloud...');
+        
+        const pool = mysql.createPool({
+          uri: databaseUrl,
+          ssl: {
+            minVersion: 'TLSv1.2',
+            rejectUnauthorized: true
+          },
+          waitForConnections: true,
+          connectionLimit: 10,
+          queueLimit: 0,
+          enableKeepAlive: true,
+          keepAliveInitialDelay: 0
         });
-        return drizzle(pool, { schema });
+
+        const db = drizzle(pool, { mode: 'default', schema });
+        console.log('✅ [DATABASE] Drizzle initialized with MySQL2 pool');
+        return db;
       },
     },
   ],
