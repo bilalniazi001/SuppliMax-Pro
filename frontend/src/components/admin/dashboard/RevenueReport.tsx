@@ -52,7 +52,7 @@ const RevenueReport: React.FC<RevenueReportProps> = ({ data }) => {
               <Tooltip 
                 cursor={{ fill: '#f8faf7' }}
                 contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
-                formatter={(value: number) => `Rs. ${value.toLocaleString()}`}
+                formatter={(value: any) => `Rs. ${Number(value).toLocaleString()}`}
               />
               <Bar 
                 dataKey="revenue" 

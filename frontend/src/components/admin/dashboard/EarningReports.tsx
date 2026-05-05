@@ -42,7 +42,7 @@ const EarningReports: React.FC<EarningReportsProps> = ({ data }) => {
             <Tooltip 
               cursor={{ fill: '#f8faf7' }}
               contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-              formatter={(value: number) => `Rs. ${value.toLocaleString()}`}
+              formatter={(value: any) => `Rs. ${Number(value).toLocaleString()}`}
             />
             <Bar dataKey="revenue" radius={[6, 6, 6, 6]} barSize={22}>
               {data.map((entry, index) => (

@@ -1,6 +1,6 @@
 'use client';
 import { API_BASE_URL } from '@/config';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { Loader2, AlertTriangle, Star, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
@@ -147,7 +147,7 @@ const ProductCard: React.FC<{
   );
 };
 
-export default function SearchResultsPage() {
+function SearchResultsContent() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isApiError, setIsApiError] = useState(false);
@@ -258,5 +258,18 @@ export default function SearchResultsPage() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function SearchResultsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center items-center min-h-[60vh] bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#629D23]"></div>
+        <p className="ml-3 text-lg text-[#2D3B29] font-semibold">Loading...</p>
+      </div>
+    }>
+      <SearchResultsContent />
+    </Suspense>
   );
 }
