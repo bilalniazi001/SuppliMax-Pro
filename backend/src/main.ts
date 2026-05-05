@@ -23,8 +23,9 @@ async function bootstrap() {
   }));
 
   // CORS Configuration
+  const frontendUrl = process.env.FRONTEND_URL || '*';
   app.enableCors({
-    origin: '*', // In production, replace with your frontend URL
+    origin: frontendUrl === '*' ? true : frontendUrl.split(',').map(u => u.trim()),
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
     credentials: true,

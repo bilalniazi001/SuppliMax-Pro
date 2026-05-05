@@ -22,8 +22,9 @@ export const createServer = async (expressInstance: any) => {
   app.use(compression());
 
   // CORS
+  const frontendUrl = process.env.FRONTEND_URL || '*';
   app.enableCors({
-    origin: '*', // Adjust this to your frontend URL in production
+    origin: frontendUrl === '*' ? true : frontendUrl.split(',').map(u => u.trim()),
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
