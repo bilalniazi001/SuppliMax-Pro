@@ -22,9 +22,15 @@ export const createServer = async (expressInstance: any) => {
   app.use(compression());
 
   // CORS
-  const frontendUrl = process.env.FRONTEND_URL || '*';
+  const allowedOrigins = process.env.FRONTEND_URL
+    ? process.env.FRONTEND_URL.split(',').map(u => u.trim())
+    : null;
   app.enableCors({
-    origin: frontendUrl === '*' ? true : frontendUrl.split(',').map(u => u.trim()),
+    origin: allowedOrigins
+      ? allowedOrigins
+      : (origin: any, callback: any) => {
+          callback(null, true);
+        },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
