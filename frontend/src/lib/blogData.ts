@@ -189,7 +189,7 @@ export const blogPosts: BlogPost[] = [
     date: 'April 10, 2026',
     author: 'SuppliMax Expert',
     category: 'Supplements',
-    image: 'https://images.unsplash.com/photo-1593095191375-7b56f8902528?q=80&w=1000',
+    image: 'https://images.unsplash.com/photo-1579722820308-d74e571900a9?q=80&w=1000',
     tags: ['BCAA', 'EAA', 'Amino Acids'],
     content: `
       <p>The supplement industry sold billions in BCAAs. Then science shifted to EAAs. Here’s the truth.</p>
@@ -254,7 +254,7 @@ export const blogPosts: BlogPost[] = [
     date: 'April 5, 2026',
     author: 'Weight Loss Specialist',
     category: 'Weight Loss',
-    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1000',
+    image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1000',
     tags: ['Fat Burner', 'Weight Loss', 'Metabolism'],
     content: `
       <p>Fat burners promise effortless weight loss. But most fail in real-world studies.</p>
@@ -294,7 +294,7 @@ export const blogPosts: BlogPost[] = [
     date: 'April 1, 2026',
     author: 'SuppliMax Expert',
     category: 'Education',
-    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=1000',
+    image: 'https://images.unsplash.com/photo-1547489432-cf93fa6c71ee?q=80&w=1000',
     tags: ['Multivitamin', 'Health', 'Vitamins'],
     content: `
       <p>Gym-goers have higher micronutrient needs due to sweat loss and muscle repair demand.</p>
@@ -331,7 +331,7 @@ export const blogPosts: BlogPost[] = [
     date: 'March 28, 2026',
     author: 'Fitness Coach',
     category: 'Nutrition',
-    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1000',
+    image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1000',
     tags: ['Nutrition', 'Recovery', 'Post-Workout'],
     content: `
       <p>The “anabolic window” is smaller than you think. Here’s what actually matters after training.</p>
@@ -368,7 +368,7 @@ export const blogPosts: BlogPost[] = [
     date: 'March 25, 2026',
     author: 'SuppliMax Expert',
     category: 'Education',
-    image: 'https://images.unsplash.com/photo-1574680096145-d05b474e2158?q=80&w=1000',
+    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1000',
     tags: ['Education', 'Supplements', 'Mistakes'],
     content: `
       <p>Walking through the supplement aisle can drain your wallet fast. Avoid these 5 mistakes.</p>

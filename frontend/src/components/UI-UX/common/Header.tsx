@@ -32,7 +32,7 @@ interface DropdownMenuProps {
 const topLinks: TopLink[] = [
   { name: 'About Us', href: '/about' },
   { name: 'Contact', href: '/contacts' },
-  { name: 'Orders', href: '/orders' },
+  { name: 'Orders', href: '/account/orders' },
   { name: 'FAQ', href: '/faq' },
 ];
 
@@ -67,7 +67,7 @@ const mainNavLinks: MainNavLink[] = [
     dropdown: [
       { name: 'Wishlist', href: '/wishlist' },
       { name: 'Cart', href: '/cart' },
-      { name: 'Orders', href: '/orders' },
+      { name: 'Orders', href: '/account/orders' },
       { name: 'Account', href: '/account' }
     ]
   },
@@ -365,7 +365,7 @@ export default function SuppliMaxNavbar() {
                     <Link href="/account" className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#629D23] hover:text-white transition-colors">
                       My Account
                     </Link>
-                    <Link href="/orders" className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#629D23] hover:text-white transition-colors">
+                    <Link href="/account/orders" className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#629D23] hover:text-white transition-colors">
                       My Orders
                     </Link>
                     <span className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#629D23] hover:text-white transition-colors">
