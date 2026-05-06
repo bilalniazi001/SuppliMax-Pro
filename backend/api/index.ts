@@ -15,30 +15,29 @@ export const createServer = async (expressInstance: any) => {
 
   // Security
   app.use(helmet({
-    contentSecurityPolicy: false, // Disable CSP if it causes issues with Google OAuth
+    contentSecurityPolicy: false,
   }));
   
-  // Compression
   app.use(compression());
 
-  // CORS
+  // Improved CORS for Vercel
   const allowedOrigins = process.env.FRONTEND_URL
     ? process.env.FRONTEND_URL.split(',').map(u => u.trim())
     : null;
+
   app.enableCors({
-    origin: allowedOrigins
-      ? allowedOrigins
-      : (origin: any, callback: any) => {
-          callback(null, true);
-        },
+    origin: allowedOrigins || ((origin, callback) => callback(null, true)),
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
   });
 
   await app.init();
   return app;
 };
 
-createServer(server);
-
-export default server;
+// Vercel serverless handler pattern
+export default async (req: any, res: any) => {
+  await createServer(server);
+  return server(req, res);
+};
