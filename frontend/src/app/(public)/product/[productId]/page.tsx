@@ -28,11 +28,11 @@ import { API_BASE_URL } from '@/config';
 async function getProduct(productId: string): Promise<Product | null> {
   try {
     console.log('🔍 [PRODUCT DETAIL] Fetching product with ID:', productId);
-    
+
     // ✅ URL ko theek tarah se join kiya hy
     const fullUrl = `${API_BASE_URL}/products/${productId}`;
     console.log('📡 [PRODUCT DETAIL] API URL:', fullUrl);
-    
+
     const res = await fetch(fullUrl, {
       cache: 'no-store', // Taaky updated data milay
       headers: {
@@ -41,14 +41,14 @@ async function getProduct(productId: string): Promise<Product | null> {
     });
 
     console.log('📊 [PRODUCT DETAIL] Response status:', res.status);
-    
+
     if (!res.ok) {
       console.error(`❌ [PRODUCT DETAIL] Error fetching product: ${res.status}`);
       return null;
     }
 
     const productData = await res.json();
-    
+
     // ✅ Mapping logic with MongoDB ID support
     const mappedProduct: Product = {
       id: productData.id || productData._id?.toString() || productId,
@@ -85,7 +85,7 @@ interface ProductDetailPageProps {
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
   let productId: string;
-  
+
   try {
     // Next.js 15+ mein params ko await karna zaroori hy
     const resolvedParams = await params;
@@ -94,7 +94,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     console.error('❌ [PRODUCT DETAIL] Error resolving params:', error);
     return renderErrorUI("Error Loading Page Parameters");
   }
-  
+
   if (!productId || productId === 'undefined') {
     return renderErrorUI(`Invalid Product ID: ${productId}`);
   }
@@ -115,8 +115,8 @@ function renderErrorUI(message: string) {
       <div className="bg-white p-8 rounded-lg shadow-md text-center max-w-md w-full">
         <div className="text-red-500 text-6xl mb-4">⚠️</div>
         <h1 className="text-2xl font-bold text-red-600 mb-4">{message}</h1>
-        <a 
-          href="/product" 
+        <a
+          href="/product"
           className="bg-[#629D23] hover:bg-[#2D3B29] text-white font-semibold py-3 px-6 rounded-lg transition duration-300 inline-block"
         >
           ← Back to Products

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { X, Mail, Lock, User, Phone, MapPin, Calendar, Hash } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { API_BASE_URL } from '@/config';
 
 // Dynamically import GoogleSignInButton so it only loads inside GoogleOAuthProvider
 const GoogleSignInButton = dynamic(() => import('./GoogleSignInButton'), { ssr: false });
@@ -53,8 +54,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
       });
       const userInfo = await userInfoRes.json();
-
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/auth/google-access`, {
+      const res = await fetch(`${API_BASE_URL}/auth/google-access`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
