@@ -340,7 +340,7 @@ const ProductList: React.FC = () => {
           <AlertTriangle className="text-red-500 w-16 h-16 mx-auto mb-4" />
           <h2 className="text-3xl font-bold text-red-700 mb-2">API Connection Error!</h2>
           <p className="text-lg text-gray-700">
-            JSON Server have to start at `http://localhost:5000`.
+            Failed to load products. Please check your connection or try again later.
           </p>
         </div>
       </div>
