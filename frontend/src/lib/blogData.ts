@@ -22,7 +22,7 @@ export const blogPosts: BlogPost[] = [
     date: 'May 1, 2026',
     author: 'SuppliMax Expert',
     category: 'Nutrition',
-    image: '/images/blog/whey-vs-plant.png',
+    image: 'https://images.unsplash.com/photo-1593095183571-2d5ff124ca35?q=80&w=1000',
     tags: ['Protein', 'Supplements', 'Fitness'],
     content: `
       <p>Not all proteins are created equal. While whey has been the gold standard for decades, plant-based proteins are gaining massive popularity. But which one should you choose?</p>
@@ -53,7 +53,7 @@ export const blogPosts: BlogPost[] = [
     date: 'April 28, 2026',
     author: 'Dr. SuppliMax',
     category: 'Supplements',
-    image: '/images/blog/creatine.png',
+    image: 'https://images.unsplash.com/photo-1546483875-ad9014c88eba?q=80&w=1000',
     tags: ['Creatine', 'Performance', 'Science'],
     content: `
       <p>Creatine has been misunderstood for years. Many think it’s only for huge bodybuilders. Science says otherwise.</p>
@@ -92,7 +92,7 @@ export const blogPosts: BlogPost[] = [
     date: 'April 25, 2026',
     author: 'Fitness Coach',
     category: 'Supplements',
-    image: '/images/blog/pre-workout.png',
+    image: 'https://images.unsplash.com/photo-1579722820308-d74e571900a9?q=80&w=1000',
     tags: ['Pre-Workout', 'Energy', 'Training'],
     content: `
       <p>Walk into any supplement store, and you’ll see pre-workouts with 20+ ingredients. Most are underdosed. Here’s what matters.</p>
@@ -123,7 +123,7 @@ export const blogPosts: BlogPost[] = [
     date: 'April 20, 2026',
     author: 'SuppliMax Expert',
     category: 'Education',
-    image: '/images/blog/labels.png',
+    image: 'https://images.unsplash.com/photo-1583416750470-965b2707b355?q=80&w=1000',
     tags: ['Education', 'Supplements', 'Health'],
     content: `
       <p>Most people buy supplements based on front-label claims. The real truth is in the back label.</p>
@@ -153,7 +153,7 @@ export const blogPosts: BlogPost[] = [
     date: 'April 15, 2026',
     author: 'Nutritionist',
     category: 'Nutrition',
-    image: '/images/blog/muscle-growth.png',
+    image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1000',
     tags: ['Muscle', 'Nutrition', 'Natural'],
     content: `
       <p>Supplements are called “supplements” for a reason – they supplement a good diet, not replace it.</p>
