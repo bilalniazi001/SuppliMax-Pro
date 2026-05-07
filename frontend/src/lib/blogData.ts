@@ -22,7 +22,7 @@ export const blogPosts: BlogPost[] = [
     date: 'May 1, 2026',
     author: 'SuppliMax Expert',
     category: 'Nutrition',
-    image: 'https://images.unsplash.com/photo-1593095183571-2d5ff124ca35?q=80&w=1000',
+    image: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=800',
     tags: ['Protein', 'Supplements', 'Fitness'],
     content: `
       <p>Not all proteins are created equal. While whey has been the gold standard for decades, plant-based proteins are gaining massive popularity. But which one should you choose?</p>
@@ -53,7 +53,7 @@ export const blogPosts: BlogPost[] = [
     date: 'April 28, 2026',
     author: 'Dr. SuppliMax',
     category: 'Supplements',
-    image: 'https://images.unsplash.com/photo-1546483875-ad9014c88eba?q=80&w=1000',
+    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800',
     tags: ['Creatine', 'Performance', 'Science'],
     content: `
       <p>Creatine has been misunderstood for years. Many think it’s only for huge bodybuilders. Science says otherwise.</p>
@@ -92,7 +92,7 @@ export const blogPosts: BlogPost[] = [
     date: 'April 25, 2026',
     author: 'Fitness Coach',
     category: 'Supplements',
-    image: 'https://images.unsplash.com/photo-1579722820308-d74e571900a9?q=80&w=1000',
+    image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800',
     tags: ['Pre-Workout', 'Energy', 'Training'],
     content: `
       <p>Walk into any supplement store, and you’ll see pre-workouts with 20+ ingredients. Most are underdosed. Here’s what matters.</p>
@@ -123,7 +123,7 @@ export const blogPosts: BlogPost[] = [
     date: 'April 20, 2026',
     author: 'SuppliMax Expert',
     category: 'Education',
-    image: 'https://images.unsplash.com/photo-1583416750470-965b2707b355?q=80&w=1000',
+    image: 'https://images.unsplash.com/photo-1550572017-ed200f5e6a43?q=80&w=800',
     tags: ['Education', 'Supplements', 'Health'],
     content: `
       <p>Most people buy supplements based on front-label claims. The real truth is in the back label.</p>
@@ -153,7 +153,7 @@ export const blogPosts: BlogPost[] = [
     date: 'April 15, 2026',
     author: 'Nutritionist',
     category: 'Nutrition',
-    image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1000',
+    image: 'https://images.unsplash.com/photo-1583454110551-21f2fa2ec617?q=80&w=800',
     tags: ['Muscle', 'Nutrition', 'Natural'],
     content: `
       <p>Supplements are called “supplements” for a reason – they supplement a good diet, not replace it.</p>
@@ -189,7 +189,7 @@ export const blogPosts: BlogPost[] = [
     date: 'April 10, 2026',
     author: 'SuppliMax Expert',
     category: 'Supplements',
-    image: 'https://images.unsplash.com/photo-1579722820308-d74e571900a9?q=80&w=1000',
+    image: 'https://images.unsplash.com/photo-1623874514711-0f321325f318?q=80&w=800',
     tags: ['BCAA', 'EAA', 'Amino Acids'],
     content: `
       <p>The supplement industry sold billions in BCAAs. Then science shifted to EAAs. Here’s the truth.</p>
@@ -254,7 +254,7 @@ export const blogPosts: BlogPost[] = [
     date: 'April 5, 2026',
     author: 'Weight Loss Specialist',
     category: 'Weight Loss',
-    image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1000',
+    image: 'https://images.unsplash.com/photo-1594403023023-9366f076b970?q=80&w=800',
     tags: ['Fat Burner', 'Weight Loss', 'Metabolism'],
     content: `
       <p>Fat burners promise effortless weight loss. But most fail in real-world studies.</p>
@@ -294,7 +294,7 @@ export const blogPosts: BlogPost[] = [
     date: 'April 1, 2026',
     author: 'SuppliMax Expert',
     category: 'Education',
-    image: 'https://images.unsplash.com/photo-1547489432-cf93fa6c71ee?q=80&w=1000',
+    image: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?q=80&w=800',
     tags: ['Multivitamin', 'Health', 'Vitamins'],
     content: `
       <p>Gym-goers have higher micronutrient needs due to sweat loss and muscle repair demand.</p>
@@ -331,7 +331,7 @@ export const blogPosts: BlogPost[] = [
     date: 'March 28, 2026',
     author: 'Fitness Coach',
     category: 'Nutrition',
-    image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1000',
+    image: 'https://images.unsplash.com/photo-1543353071-873f17a7a088?q=80&w=800',
     tags: ['Nutrition', 'Recovery', 'Post-Workout'],
     content: `
       <p>The “anabolic window” is smaller than you think. Here’s what actually matters after training.</p>
@@ -368,7 +368,7 @@ export const blogPosts: BlogPost[] = [
     date: 'March 25, 2026',
     author: 'SuppliMax Expert',
     category: 'Education',
-    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1000',
+    image: 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=800',
     tags: ['Education', 'Supplements', 'Mistakes'],
     content: `
       <p>Walking through the supplement aisle can drain your wallet fast. Avoid these 5 mistakes.</p>
