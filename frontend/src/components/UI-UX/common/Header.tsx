@@ -420,21 +420,7 @@ export default function SuppliMaxNavbar() {
       {isScrolled && <div style={{ height: navHeight }} className="hidden lg:block" />}
 
       <nav ref={mainNavbarRef} className={`bg-[#4a7a1b] text-white z-60 w-full ${stickyClass}`}>
-        <div className="container mx-auto px-4 flex items-center justify-between h-14">
-
-          <div className="relative group bg-[#629D23] hover:bg-[#2D3B29] h-full flex items-center transition-colors px-6 cursor-pointer z-[70]">
-            <div className="flex items-center space-x-2 font-bold text-lg">
-              <span className='w-5 h-5'>
-                <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                  <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd"></path>
-                </svg>
-              </span>
-              <span>All Categories</span>
-              <ChevronDown className="w-4 h-4" />
-            </div>
-            <DropdownMenu items={categories} />
-          </div>
-
+        <div className="container mx-auto px-4 flex items-center justify-center h-14">
           <div className="hidden lg:flex items-center space-x-8 h-full">
             {mainNavLinks.map((link: MainNavLink) => (
               <div key={link.name} className={`relative group h-full flex items-center transition-all ${link.dropdown ? 'cursor-pointer z-[70]' : ''}`}>
@@ -445,12 +431,6 @@ export default function SuppliMaxNavbar() {
                 {link.dropdown && <DropdownMenu items={link.dropdown} />}
               </div>
             ))}
-          </div>
-
-          <div className="flex items-center">
-            <span className="px-4 py-2 bg-[#2D3B29] text-white font-bold text-sm rounded-full shadow-lg hover:bg-[#629D23] transition-colors">
-              Exclusive Sale Offer!
-            </span>
           </div>
         </div>
       </nav>

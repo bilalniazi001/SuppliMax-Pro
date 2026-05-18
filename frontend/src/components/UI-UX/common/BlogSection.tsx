@@ -7,8 +7,8 @@ import { ArrowRight } from 'lucide-react';
 import { blogPosts } from '@/lib/blogData';
 
 export default function BlogSection() {
-  // Use the first 4 blog posts from our library
-  const displayBlogs = blogPosts.slice(0, 4);
+  // Use the first 3 blog posts from our library
+  const displayBlogs = blogPosts.slice(0, 3);
 
   return (
     <section className="container mx-auto px-4 py-16 border-t border-gray-100">
@@ -18,7 +18,7 @@ export default function BlogSection() {
         <div className="w-16 h-1 bg-[#629D23] mx-auto mt-4"></div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 mb-12 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12 max-w-6xl mx-auto">
         {displayBlogs.map((blog) => (
           <div key={blog.id} className="group cursor-pointer bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
             <Link href={`/blog/${blog.slug}`}>
