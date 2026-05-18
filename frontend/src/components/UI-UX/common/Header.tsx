@@ -419,7 +419,7 @@ export default function SuppliMaxNavbar() {
 
       {isScrolled && <div style={{ height: navHeight }} className="hidden lg:block" />}
 
-      <nav ref={mainNavbarRef} className={`bg-[#4a7a1b] text-white z-60 w-full ${stickyClass}`}>
+      <nav ref={mainNavbarRef} className={`hidden lg:block bg-[#4a7a1b] text-white z-60 w-full ${stickyClass}`}>
         <div className="container mx-auto px-4 flex items-center justify-center h-14">
           <div className="hidden lg:flex items-center space-x-8 h-full">
             {mainNavLinks.map((link: MainNavLink) => (
