@@ -166,7 +166,8 @@ export default function OrdersPage() {
 
                   {/* Tracking Progress */}
                   <div className="p-8">
-                    <div className="relative">
+                    {/* Horizontal Steps for Medium and Large Screens */}
+                    <div className="relative hidden md:block">
                       {/* Line */}
                       <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 -translate-y-1/2 z-0"></div>
                       <div 
@@ -197,6 +198,33 @@ export default function OrdersPage() {
                           );
                         })}
                       </div>
+                    </div>
+
+                    {/* Vertical Stepper list for Mobile Screens */}
+                    <div className="relative md:hidden pl-4 border-l-2 border-dashed border-gray-200 ml-4 space-y-6">
+                      {steps.map((step, idx) => {
+                        const Icon = step.icon;
+                        const isActive = idx <= currentStep;
+                        const isCurrent = idx === currentStep;
+                        
+                        return (
+                          <div key={idx} className="flex items-center space-x-4 relative">
+                            {/* Bullet Point Circle on the line */}
+                            <div className={`absolute -left-[29px] w-6 h-6 rounded-full flex items-center justify-center transition-all duration-500 ${
+                              isActive ? 'bg-[#629D23] text-white shadow-md' : 'bg-white text-gray-300 border border-gray-200'
+                            } ${isCurrent ? 'ring-4 ring-green-100' : ''}`}>
+                              <Icon size={12} />
+                            </div>
+                            
+                            {/* Step Description */}
+                            <div>
+                              <span className={`text-sm font-bold block ${isActive ? 'text-[#629D23]' : 'text-gray-400'}`}>
+                                {step.name}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 

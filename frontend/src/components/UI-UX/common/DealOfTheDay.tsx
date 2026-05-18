@@ -80,7 +80,7 @@ export default function DealOfTheDay() {
           {/* Right Side: Deal Box */}
           {/* Pushed further down via translate-y-[35%] */}
           <div className="w-full md:w-1/2 flex justify-center md:justify-end md:pr-8">
-            <div className="bg-[#8cc63f] p-8 md:p-12 w-full max-w-md shadow-2xl relative transform translate-y-[35%] flex flex-col items-center text-center">
+            <div className="bg-[#8cc63f] p-8 md:p-12 w-full max-w-md shadow-2xl relative transform translate-y-6 md:translate-y-[35%] flex flex-col items-center text-center">
               <h2 className="text-3xl md:text-4xl font-black text-black uppercase leading-none mb-6 tracking-tight">
                 Deal of the <br />Days.
               </h2>

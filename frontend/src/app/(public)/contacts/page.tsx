@@ -226,7 +226,7 @@ export default function ContactPage() {
                                 <ContactInfoCard key={index} {...store} />
                             ))}
 
-                            <div className="grid grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 {CONTACT_FEATURES.map((feature, i) => (
                                     <motion.div
                                         key={i}

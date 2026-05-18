@@ -2,14 +2,17 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ShoppingCart, Heart, User, Search, ChevronDown, Facebook, Instagram, Youtube, Twitter } from 'lucide-react';
+import { 
+  ShoppingCart, Heart, User, Search, ChevronDown, Facebook, Instagram, Youtube, Twitter,
+  Home, ShoppingBag, Tag, BookOpen, Layers, Menu
+} from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import AuthModal from '@/components/AuthModal';
 import { API_BASE_URL } from '@/config';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 // --- TYPE DEFINITIONS (Interfaces) ---
 interface TopLink {
@@ -99,6 +102,13 @@ export default function SuppliMaxNavbar() {
   const mainNavbarRef = useRef<HTMLDivElement>(null);
   const [headerWrapperHeight, setHeaderWrapperHeight] = useState<number>(130);
 
+  // Mobile navigation states & refs
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+  const [isMobilePagesOpen, setIsMobilePagesOpen] = useState<boolean>(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const mobilePagesRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
   // Search state
   const [allProducts, setAllProducts] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -109,6 +119,20 @@ export default function SuppliMaxNavbar() {
   const { isAuthenticated, user, logout } = useAuth();
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
+
+  // Close mobile menus on outside click
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
+        setIsMobileMenuOpen(false);
+      }
+      if (mobilePagesRef.current && !mobilePagesRef.current.contains(e.target as Node)) {
+        setIsMobilePagesOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   // Fetch categories from API to ensure consistency with ProductCategoryQueue
   useEffect(() => {
@@ -431,29 +455,190 @@ export default function SuppliMaxNavbar() {
         </div>
       </nav>
 
-      <div className="lg:hidden bg-white shadow-md p-3 flex justify-between items-center sticky top-0 z-50">
-        <Link href="/">
-          <img src="/Images/sm-logo.png" alt="SuppliMax" className="h-10 w-auto" />
-        </Link>
-        <div className="flex space-x-3">
-          <Search className="w-6 h-6 text-gray-600" />
-
-          <Heart className="w-6 h-6 text-gray-600" />
-
-
-          <ShoppingCart className="w-6 h-6 text-gray-600" />
-
-          {isAuthenticated ? (
-            <Link href="/account">
-              <div className="w-6 h-6 bg-[#629D23] rounded-full flex items-center justify-center text-white text-xs font-bold">
-                {user ? getUserInitials(user.name) : 'U'}
+      {/* Mobile Sticky Top Header */}
+      <div className="lg:hidden bg-white shadow-md px-4 py-3 flex justify-between items-center sticky top-0 z-50 border-b border-gray-100">
+        {/* Left Side: Dropdown Menu Icon */}
+        <div className="relative" ref={mobileMenuRef}>
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 focus:outline-none"
+            aria-label="Toggle menu"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+          
+          {/* Dropdown Items */}
+          {isMobileMenuOpen && (
+            <div className="absolute left-0 mt-3 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden transform origin-top-left transition-all duration-300 animate-slide-down">
+              <div className="py-1">
+                {topLinks.map((link) => (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-[#629D23] hover:text-white transition-colors duration-150"
+                  >
+                    {link.name}
+                  </Link>
+                ))}
               </div>
-            </Link>
+            </div>
+          )}
+        </div>
+
+        {/* Center: Logo */}
+        <div className="flex-1 flex justify-center">
+          <Link href="/">
+            <img src="/Images/sm-logo.png" alt="SuppliMax" className="h-10 w-auto object-contain cursor-pointer hover:opacity-90 transition-opacity" />
+          </Link>
+        </div>
+
+        {/* Right Side: Wishlist, Cart & Login Icons */}
+        <div className="flex items-center space-x-3">
+          {/* Wishlist Icon */}
+          <Link
+            href="/wishlist"
+            className="p-1.5 text-gray-600 hover:text-[#629D23] transition-colors relative"
+            aria-label="Wishlist"
+          >
+            <Heart className={`w-6 h-6 ${pathname === '/wishlist' ? 'text-[#629D23] fill-[#629D23]' : ''}`} />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-black w-4.5 h-4.5 flex items-center justify-center rounded-full shadow-sm animate-bounce">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
+
+          {/* Cart Icon */}
+          <Link
+            href="/cart"
+            className="p-1.5 text-gray-600 hover:text-[#629D23] transition-colors relative"
+            aria-label="Cart"
+          >
+            <ShoppingCart className={`w-6 h-6 ${pathname === '/cart' ? 'text-[#629D23]' : ''}`} />
+            {cartCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-[#629D23] text-white text-[9px] font-black w-4.5 h-4.5 flex items-center justify-center rounded-full shadow-sm animate-bounce">
+                {cartCount}
+              </span>
+            )}
+          </Link>
+
+          {/* Login / Account Icon */}
+          {isAuthenticated ? (
+            <div className="relative group">
+              <Link href="/account">
+                <div className="w-7 h-7 bg-[#629D23] rounded-full flex items-center justify-center text-white text-xs font-black shadow-sm transform hover:scale-105 transition-transform border border-white">
+                  {user ? getUserInitials(user.name) : 'U'}
+                </div>
+              </Link>
+            </div>
           ) : (
-            <button onClick={() => setShowAuthModal(true)}>
-              <User className="w-6 h-6 text-gray-600" />
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="p-1.5 text-gray-600 hover:text-[#629D23] transition-colors focus:outline-none"
+              aria-label="Login"
+            >
+              <User className="w-6 h-6" />
             </button>
           )}
+        </div>
+      </div>
+
+      {/* Mobile Fixed Bottom Navigation Bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] z-50 pb-safe">
+        <div className="flex justify-around items-center h-16 px-2">
+          {/* Home Tab */}
+          <Link
+            href="/"
+            className={`flex flex-col items-center justify-center flex-1 h-full py-2 transition-all ${
+              pathname === '/' ? 'text-[#629D23]' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <Home className="w-6 h-6" />
+            <span className="text-[10px] font-bold mt-1 tracking-wide">Home</span>
+          </Link>
+
+          {/* Shop Tab */}
+          <Link
+            href="/product"
+            className={`flex flex-col items-center justify-center flex-1 h-full py-2 transition-all ${
+              pathname === '/product' || pathname.startsWith('/shop') ? 'text-[#629D23]' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <ShoppingBag className="w-6 h-6" />
+            <span className="text-[10px] font-bold mt-1 tracking-wide">Shop</span>
+          </Link>
+
+          {/* Offers Tab */}
+          <Link
+            href="/offers"
+            className={`flex flex-col items-center justify-center flex-1 h-full py-2 transition-all ${
+              pathname === '/offers' ? 'text-[#629D23]' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <Tag className="w-6 h-6" />
+            <span className="text-[10px] font-bold mt-1 tracking-wide">Offers</span>
+          </Link>
+
+          {/* Blog Tab */}
+          <Link
+            href="/blog"
+            className={`flex flex-col items-center justify-center flex-1 h-full py-2 transition-all ${
+              pathname.startsWith('/blog') ? 'text-[#629D23]' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <BookOpen className="w-6 h-6" />
+            <span className="text-[10px] font-bold mt-1 tracking-wide">Blog</span>
+          </Link>
+
+          {/* Pages Tab (Dropdown Popup) */}
+          <div className="relative flex-1 h-full" ref={mobilePagesRef}>
+            <button
+              onClick={() => setIsMobilePagesOpen(!isMobilePagesOpen)}
+              className={`flex flex-col items-center justify-center w-full h-full py-2 focus:outline-none transition-all ${
+                isMobilePagesOpen ? 'text-[#629D23]' : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <Layers className="w-6 h-6" />
+              <span className="text-[10px] font-bold mt-1 tracking-wide">Pages</span>
+            </button>
+
+            {/* Bubble Popup Menu above the bottom bar */}
+            {isMobilePagesOpen && (
+              <div className="absolute bottom-16 right-1/2 translate-x-1/2 w-44 bg-white border border-gray-100 rounded-2xl shadow-[0_-8px_24px_rgba(0,0,0,0.12)] z-50 overflow-hidden transform origin-bottom transition-all duration-300 animate-slide-up">
+                <div className="py-1">
+                  <Link
+                    href="/wishlist"
+                    onClick={() => setIsMobilePagesOpen(false)}
+                    className="block px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-[#629D23] hover:text-white transition-colors"
+                  >
+                    Wishlist
+                  </Link>
+                  <Link
+                    href="/cart"
+                    onClick={() => setIsMobilePagesOpen(false)}
+                    className="block px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-[#629D23] hover:text-white transition-colors"
+                  >
+                    Cart
+                  </Link>
+                  <Link
+                    href="/account/orders"
+                    onClick={() => setIsMobilePagesOpen(false)}
+                    className="block px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-[#629D23] hover:text-white transition-colors"
+                  >
+                    Orders
+                  </Link>
+                  <Link
+                    href="/account"
+                    onClick={() => setIsMobilePagesOpen(false)}
+                    className="block px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-[#629D23] hover:text-white transition-colors"
+                  >
+                    Account
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </>

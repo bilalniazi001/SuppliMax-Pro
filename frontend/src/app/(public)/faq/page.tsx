@@ -311,7 +311,35 @@ export default function FAQPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
               {/* Category Sidebar */}
               <div className="lg:col-span-4">
-                <div className="sticky top-24 space-y-3">
+                {/* Horizontal Scrollable Category Bar on Mobile/Tablet */}
+                <div className="lg:hidden mb-8">
+                  <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Categories</h3>
+                  <div className="flex overflow-x-auto gap-3 pb-3 snap-x snap-mandatory scrollbar-none">
+                    {FAQ_CATEGORIES.map((category, index) => {
+                      const Icon = category.icon;
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => {
+                            setActiveCategory(index);
+                            setOpenIndex(null);
+                          }}
+                          className={`flex-shrink-0 flex items-center gap-2 py-3 px-5 rounded-full text-sm font-bold snap-start transition-all duration-300 ${
+                            activeCategory === index
+                              ? 'bg-[#629D23] text-white shadow-lg shadow-[#629D23]/20'
+                              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-100'
+                          }`}
+                        >
+                          <Icon size={16} />
+                          <span>{category.title}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Vertical Category Sidebar on Large Screens */}
+                <div className="hidden lg:block sticky top-24 space-y-3">
                   <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Categories</h3>
                   {FAQ_CATEGORIES.map((category, index) => {
                     const Icon = category.icon;

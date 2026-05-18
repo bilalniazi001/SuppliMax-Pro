@@ -435,7 +435,7 @@ const ProductList: React.FC = () => {
           {/* --- Product Grid (Right Column) --- */}
           <main className="lg:flex-1">
             {/* Top Bar: Sort Dropdown and Results Count */}
-            <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-xl shadow-md border border-gray-100">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6 p-4 bg-white rounded-xl shadow-md border border-gray-100">
               <div>
                 <p className="text-lg font-medium text-[#2D3B29]">
                   Showing <span className="font-bold text-lime-600">{validProductsCount}</span> products

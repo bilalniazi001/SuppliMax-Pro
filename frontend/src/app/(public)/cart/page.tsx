@@ -49,7 +49,7 @@ export default function CartPage() {
           <div className="lg:col-span-8">
             <ul className="space-y-6">
               {cart.map((product) => (
-                <li key={product.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-6 hover:shadow-md transition-shadow">
+                <li key={product.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6 hover:shadow-md transition-shadow">
                   <div className="flex-shrink-0 w-24 h-24 bg-gray-50 rounded-xl overflow-hidden flex items-center justify-center p-2">
                     <img
                       src={product.imageUrl}
@@ -58,8 +58,8 @@ export default function CartPage() {
                     />
                   </div>
                   
-                  <div className="flex-1 flex flex-col justify-between">
-                    <div className="flex justify-between items-start">
+                  <div className="flex-1 w-full flex flex-col justify-between">
+                    <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start text-center sm:text-left gap-2 sm:gap-0">
                       <div>
                         <h3 className="text-lg font-bold text-[#2D3B29] hover:text-[#629D23] transition-colors">
                           <Link href={`/product/${product.id}`}>{product.name}</Link>
@@ -69,7 +69,7 @@ export default function CartPage() {
                       <p className="text-lg font-extrabold text-[#2D3B29]">{product.price.toFixed(2)} Rs</p>
                     </div>
 
-                    <div className="flex items-center justify-between mt-4">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0 mt-4 border-t sm:border-t-0 pt-4 sm:pt-0 border-gray-50">
                       <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
                         <button 
                           onClick={() => updateQuantity(product.id, product.quantity - 1)}

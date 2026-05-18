@@ -109,7 +109,7 @@ export default function AboutPage() {
             <span className="inline-block px-4 py-1 rounded-full bg-white/20 backdrop-blur-md text-white font-bold text-sm mb-6 border border-white/30">
               ESTABLISHED 2024
             </span>
-            <h1 className="text-6xl md:text-8xl font-extrabold text-white mb-8 tracking-tighter leading-none">
+            <h1 className="text-4xl sm:text-6xl md:text-8xl font-extrabold text-white mb-8 tracking-tighter leading-none">
               Defining the Future of <span className="text-[#89C343]">Supply</span>
             </h1>
             <p className="text-xl text-gray-200 mb-10 leading-relaxed">
@@ -170,7 +170,7 @@ export default function AboutPage() {
               className="space-y-8"
             >
               <span className="text-[#629D23] font-bold tracking-widest uppercase text-sm">Our Legacy</span>
-              <h2 className="text-5xl font-extrabold text-gray-900 leading-tight">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
                 Crafting Excellence in Every Shipment
               </h2>
               <p className="text-xl text-gray-600 leading-relaxed">
@@ -202,7 +202,7 @@ export default function AboutPage() {
       <section className="py-32 bg-gray-50">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-5xl font-extrabold text-gray-900 mb-6">Why You Choose Us?</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">Why You Choose Us?</h2>
             <p className="text-xl text-gray-500">We don&apos;t just deliver products; we deliver trust and value at every step of the way.</p>
           </div>
 
@@ -234,7 +234,7 @@ export default function AboutPage() {
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
             <div className="max-w-2xl">
-              <h2 className="text-5xl font-extrabold text-gray-900 mb-6">Meet Our Visionaries</h2>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">Meet Our Visionaries</h2>
               <p className="text-xl text-gray-500">The brilliant minds behind SuppliMax working tirelessly to serve you better.</p>
             </div>
             <button className="bg-gray-900 text-white px-8 py-4 rounded-full font-bold hover:bg-[#629D23] transition-colors flex items-center gap-2">

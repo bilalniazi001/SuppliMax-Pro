@@ -17,10 +17,6 @@ interface CategoryItem {
   href: string;
 }
 
-// ✅ Dynamic Base URL Setup
-
-
-
 export default function ProductCategoryQueue() {
   const [categoriesData, setCategoriesData] = useState<CategoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,8 +96,8 @@ export default function ProductCategoryQueue() {
       ) : (
         <div className="flex flex-wrap justify-center gap-8 md:gap-12 lg:gap-16">
           {categoriesData.map((category) => (
-            <Link 
-              key={category.id} 
+            <Link
+              key={category.id}
               href={category.href}
               className="flex flex-col items-center group w-24 md:w-32"
             >
