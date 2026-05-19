@@ -64,7 +64,8 @@ const ProductCard: React.FC<{ product: ProductItem }> = ({ product }) => {
   const stars = Array(5).fill(0).map((_, i) => (
     <Star 
       key={`star-${product.id}-${i}`} 
-      size={14} 
+      size={10} 
+      className="sm:w-3.5 sm:h-3.5"
       fill={i < Math.floor(product.rating) ? '#FBBF24' : 'none'} 
       stroke="#FBBF24" 
     />
@@ -77,52 +78,54 @@ const ProductCard: React.FC<{ product: ProductItem }> = ({ product }) => {
       variants={itemVariants}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="relative overflow-hidden bg-white group shadow-md hover:shadow-xl transition-shadow duration-300 rounded-2xl border border-gray-100"
+      className="relative overflow-hidden bg-white group shadow-md hover:shadow-xl transition-shadow duration-300 rounded-2xl border border-gray-100 h-full flex flex-col justify-between"
     >
-      <div className="relative h-48 w-full overflow-hidden bg-white flex items-center justify-center p-4">
+      <div className="relative h-28 sm:h-48 w-full overflow-hidden bg-white flex items-center justify-center p-2 sm:p-4">
         <img
           src={imageError || !product.imageUrl ? 'https://images.unsplash.com/photo-1583454110551-21f2fa2ec617?w=800&auto=format&fit=crop&q=60' : product.imageUrl}
           alt={product.name}
-          className={`max-w-full max-h-40 object-contain transition-all duration-500 ease-in-out ${
+          className={`max-w-full max-h-24 sm:max-h-40 object-contain transition-all duration-500 ease-in-out ${
             imageLoaded ? 'group-hover:scale-105' : 'opacity-0'
           }`}
           onLoad={() => setImageLoaded(true)}
           onError={() => setImageError(true)}
         />
         
-        <div className="absolute top-3 right-3 flex flex-col space-y-2">
+        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex flex-col space-y-1.5">
           <button 
             onClick={toggleWishlist}
-            className={`p-2 rounded-full shadow-lg transition-all ${isFavorited ? 'bg-red-50 text-red-500' : 'bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-red-50 hover:text-red-500'}`}
+            className={`p-1.5 sm:p-2 rounded-full shadow-lg transition-all ${isFavorited ? 'bg-red-50 text-red-500' : 'bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-red-50 hover:text-red-500'}`}
           >
-            <Heart size={16} fill={isFavorited ? "currentColor" : "none"} />
+            <Heart size={12} className="sm:w-4 sm:h-4" fill={isFavorited ? "currentColor" : "none"} />
           </button>
           <Link href={productUrl}>
-            <div className="p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-[#629D23] hover:text-white transition-all cursor-pointer text-gray-700">
-              <Eye size={16} />
+            <div className="p-1.5 sm:p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-[#629D23] hover:text-white transition-all cursor-pointer text-gray-700">
+              <Eye size={12} className="sm:w-4 sm:h-4" />
             </div>
           </Link>
         </div>
 
-        {product.isNewArrival && <span className="absolute top-3 left-3 bg-[#629D23] text-white text-[10px] font-black px-2 py-1 rounded-full z-10 uppercase tracking-widest">New</span>}
+        {product.isNewArrival && <span className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-[#629D23] text-white text-[8px] sm:text-[10px] font-black px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full z-10 uppercase tracking-widest">New</span>}
       </div>
 
-      <div className="p-4">
-        <h3 className="text-sm font-bold text-gray-900 mb-1 truncate">{product.name}</h3>
+      <div className="p-2 sm:p-4">
+        <h3 className="text-xs sm:text-sm font-bold text-gray-900 mb-1 truncate">{product.name}</h3>
         <div className="flex items-center mb-2">
-          {stars}
-          <span className="text-[10px] text-gray-400 ml-1 font-bold">({product.rating})</span>
+          <div className="flex items-center">
+            {stars}
+          </div>
+          <span className="text-[9px] sm:text-[10px] text-gray-400 ml-1 font-bold">({product.rating.toFixed(1)})</span>
         </div>
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-lg font-black text-[#629D23]">{product.price.toFixed(0)} Rs</span>
-            {oldPrice && <span className="text-xs text-gray-400 line-through ml-2">{oldPrice.toFixed(0)} Rs</span>}
+            <span className="text-xs sm:text-lg font-black text-[#629D23]">{product.price.toFixed(0)} Rs</span>
+            {oldPrice && <span className="text-[9px] sm:text-xs text-gray-400 line-through ml-1 sm:ml-2">{oldPrice.toFixed(0)} Rs</span>}
           </div>
           <button 
             onClick={(e) => { e.preventDefault(); addToCart(product as any); }}
-            className="p-2 bg-gray-900 text-white rounded-lg hover:bg-[#629D23] transition-colors"
+            className="p-1.5 sm:p-2 bg-gray-900 text-white rounded-lg hover:bg-[#629D23] transition-colors"
           >
-            <ShoppingBag size={16} />
+            <ShoppingBag size={12} className="sm:w-4 sm:h-4" />
           </button>
         </div>
       </div>
@@ -186,7 +189,7 @@ export default function CategoryProductsSection() {
         </div>
         
         <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+          className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-8"
           variants={containerVariants} 
           initial="hidden" 
           whileInView="visible"
