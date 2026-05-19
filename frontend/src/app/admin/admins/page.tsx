@@ -122,15 +122,15 @@ export default function AdminAdminsPage() {
   }
 
   return (
-    <div className="p-6 md:p-10 space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="p-4 sm:p-6 md:p-10 space-y-6 sm:space-y-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-4xl font-extrabold text-[#2D3B29]">Admin Management</h1>
-          <p className="text-gray-500 mt-1">Add and manage administrative accounts for your platform</p>
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-[#2D3B29]">Admin Management</h1>
+          <p className="text-sm text-gray-500 mt-1">Add and manage administrative accounts for your platform</p>
         </div>
         <button 
           onClick={handleOpenAddModal}
-          className="flex items-center justify-center bg-[#629D23] text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-[#2D3B29] transition-all transform hover:-translate-y-1 active:scale-95"
+          className="flex items-center justify-center bg-[#629D23] text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-[#2D3B29] transition-all transform hover:-translate-y-1 active:scale-95 w-full sm:w-auto"
         >
           <Plus size={20} className="mr-2" />
           Add New Admin
@@ -138,7 +138,8 @@ export default function AdminAdminsPage() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
@@ -216,6 +217,64 @@ export default function AdminAdminsPage() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Card Grid View */}
+        <div className="grid grid-cols-1 gap-4 md:hidden p-4 bg-white">
+          {admins.length === 0 ? (
+            <div className="text-center py-10 text-gray-500 italic">
+              No administrative accounts found.
+            </div>
+          ) : (
+            admins.map((u) => (
+              <div key={u.id} className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col space-y-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-[#E8F3DE] rounded-xl flex items-center justify-center text-[#629D23] shadow-sm flex-shrink-0">
+                    <Shield size={20} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm text-gray-900 truncate">{u.name}</p>
+                    <span className="text-[9px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold uppercase inline-block mt-0.5">
+                      Admin
+                    </span>
+                  </div>
+                </div>
+
+                <div className="pt-2.5 border-t border-gray-200/60 space-y-2 text-xs text-gray-600">
+                  <div className="flex items-center">
+                    <Mail size={14} className="mr-2 text-gray-400 flex-shrink-0" />
+                    <span className="truncate">{u.email}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Phone size={14} className="mr-2 text-gray-400 flex-shrink-0" />
+                    <span>{u.phone || 'N/A'}</span>
+                  </div>
+                  <div className="flex items-center justify-between pt-1">
+                    <div className="flex items-center text-gray-400 font-medium">
+                      <Calendar size={14} className="mr-1.5 flex-shrink-0" />
+                      <span>{new Date(u.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => handleOpenEditModal(u)}
+                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Edit Admin"
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(u.id)}
+                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete Admin"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 

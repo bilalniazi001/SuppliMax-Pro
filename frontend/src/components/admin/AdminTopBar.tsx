@@ -2,8 +2,12 @@
 
 import { useAuth } from '@/context/AuthContext';
 
-const AdminTopBar = () => {
-  const { user, logout } = useAuth();
+interface AdminTopBarProps {
+  onMenuClick: () => void;
+}
+
+const AdminTopBar: React.FC<AdminTopBarProps> = ({ onMenuClick }) => {
+  const { user } = useAuth();
 
   const getUserInitials = (name: string) => {
     return name
@@ -15,17 +19,31 @@ const AdminTopBar = () => {
   };
 
   return (
-    <header className="flex items-center justify-between h-16 bg-white px-6 sticky top-0 z-40 border-b border-gray-200 shadow-sm">
+    <header className="flex items-center justify-between h-16 bg-white px-4 sm:px-6 sticky top-0 z-40 border-b border-gray-200 shadow-sm">
       
-      <div className="relative w-96">
-        <input
-          type="text"
-          placeholder="Search items, orders, or users..."
-          className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#629D23]/40 focus:border-[#629D23]/40"
-        />
-        <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-        </svg>
+      <div className="flex items-center flex-1 min-w-0 mr-4">
+        {/* Hamburger Menu Trigger for Mobile */}
+        <button 
+          onClick={onMenuClick}
+          className="lg:hidden p-2 -ml-1 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-[#629D23] transition-colors focus:outline-none mr-2 flex-shrink-0"
+          aria-label="Open sidebar"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        {/* Responsive Search Box */}
+        <div className="relative w-full max-w-[180px] sm:max-w-md">
+          <input
+            type="text"
+            placeholder="Search items..."
+            className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#629D23]/40 focus:border-[#629D23]/40"
+          />
+          <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
       </div>
       
       <div className="flex items-center space-x-4">

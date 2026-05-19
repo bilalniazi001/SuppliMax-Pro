@@ -65,10 +65,10 @@ export default function ProductList({ products }: ProductListProps) {
   }
 
   return (
-    <div className="overflow-x-auto bg-white rounded-xl shadow-xl p-6 border border-gray-100">
-      <div className="flex justify-between items-center mb-6 border-b pb-4">
-        <h2 className="text-3xl font-bold text-[#2D3B29]">Inventory Management</h2>
-        <span className="bg-gray-100 text-gray-700 px-4 py-1 rounded-full text-sm font-semibold">
+    <div className="bg-white rounded-xl shadow-xl p-4 sm:p-6 border border-gray-100">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 border-b pb-4">
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#2D3B29]">Inventory Management</h2>
+        <span className="bg-gray-100 text-gray-700 px-4 py-1 rounded-full text-sm font-semibold self-start sm:self-auto">
           Total: {products.length} Items
         </span>
       </div>
@@ -81,69 +81,122 @@ export default function ProductList({ products }: ProductListProps) {
           </Link>
         </div>
       ) : (
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Product</th>
-              <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Price</th>
-              <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Stock</th>
-              <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Status</th>
-              <th className="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+        <>
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Product</th>
+                  <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Price</th>
+                  <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Stock</th>
+                  <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Status</th>
+                  <th className="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {products.map((product) => {
+                  const pid = getProductId(product);
+                  
+                  return (
+                    <tr key={pid} className="hover:bg-gray-50 transition">
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <img src={product.imageUrl || '/placeholder.png'} alt="" className="w-12 h-12 rounded object-cover mr-3 border" />
+                          <div>
+                            <div className="text-sm font-bold text-[#2D3B29]">{product.name}</div>
+                            <div className="text-xs text-gray-500">{product.category}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-center text-lg font-black text-[#2D3B29]">
+                        Rs. {product.price.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-4 text-center">
+                        <span className={`px-2 py-1 text-xs rounded-full font-bold ${product.quantityInStock > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          {product.quantityInStock} in stock
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 text-center">
+                        {product.onSale ? (
+                          <span className="bg-orange-100 text-orange-700 text-[10px] px-2 py-1 rounded-md font-black">SALE {product.discountPercentage}%</span>
+                        ) : (
+                          <span className="text-gray-400 text-xs">Standard</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <Link 
+                            href={`/admin/products/edit/${pid}`}
+                            className="relative overflow-hidden inline-flex items-center justify-center bg-[#629D23] text-white hover:bg-[#4c781d] px-6 py-2 rounded-xl transition-all duration-300 text-sm font-bold shadow-md hover:shadow-lg group min-w-[80px]"
+                          >
+                            <span className="relative z-10">Edit</span>
+                            <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(product)}
+                            className="relative overflow-hidden inline-flex items-center justify-center bg-[#2D3B29] text-white hover:bg-black px-6 py-2 rounded-xl transition-all duration-300 text-sm font-bold shadow-md hover:shadow-lg group min-w-[80px]"
+                          >
+                            <span className="relative z-10">Delete</span>
+                            <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Card Grid View */}
+          <div className="grid grid-cols-1 gap-4 md:hidden">
             {products.map((product) => {
               const pid = getProductId(product);
-              
               return (
-                <tr key={pid} className="hover:bg-gray-50 transition">
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <img src={product.imageUrl || '/placeholder.png'} alt="" className="w-12 h-12 rounded object-cover mr-3 border" />
-                      <div>
-                        <div className="text-sm font-bold text-[#2D3B29]">{product.name}</div>
-                        <div className="text-xs text-gray-500">{product.category}</div>
+                <div key={pid} className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <img src={product.imageUrl || '/placeholder.png'} alt="" className="w-16 h-16 rounded-lg object-cover border bg-white flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-bold text-[#2D3B29] truncate">{product.name}</div>
+                      <div className="text-xs text-gray-500">{product.category}</div>
+                      <div className="mt-1.5 flex flex-wrap gap-1.5">
+                        <span className={`px-2 py-0.5 text-[10px] rounded-full font-bold inline-block ${product.quantityInStock > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          {product.quantityInStock} stock
+                        </span>
+                        {product.onSale && (
+                          <span className="bg-orange-100 text-orange-700 text-[9px] px-2 py-0.5 rounded font-black uppercase">
+                            SALE {product.discountPercentage}%
+                          </span>
+                        )}
                       </div>
                     </div>
-                  </td>
-                  <td className="px-4 py-4 text-center text-lg font-black text-[#2D3B29]">
-                    Rs. {product.price.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-4 text-center">
-                    <span className={`px-2 py-1 text-xs rounded-full font-bold ${product.quantityInStock > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                      {product.quantityInStock} in stock
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 text-center">
-                    {product.onSale ? (
-                      <span className="bg-orange-100 text-orange-700 text-[10px] px-2 py-1 rounded-md font-black">SALE {product.discountPercentage}%</span>
-                    ) : (
-                      <span className="text-gray-400 text-xs">Standard</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <div className="flex items-center justify-center gap-2">
+                  </div>
+                  
+                  <div className="flex items-center justify-between pt-2.5 border-t border-gray-200/60">
+                    <div className="text-sm font-black text-[#2D3B29]">
+                      Rs. {product.price.toLocaleString()}
+                    </div>
+                    <div className="flex items-center gap-2">
                       <Link 
                         href={`/admin/products/edit/${pid}`}
-                        className="relative overflow-hidden inline-flex items-center justify-center bg-[#629D23] text-white hover:bg-[#4c781d] px-6 py-2 rounded-xl transition-all duration-300 text-sm font-bold shadow-md hover:shadow-lg group min-w-[80px]"
+                        className="px-4 py-1.5 bg-[#629D23] text-white hover:bg-[#4c781d] rounded-lg text-xs font-bold transition shadow-sm"
                       >
-                        <span className="relative z-10">Edit</span>
-                        <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                        Edit
                       </Link>
                       <button
                         onClick={() => handleDelete(product)}
-                        className="relative overflow-hidden inline-flex items-center justify-center bg-[#2D3B29] text-white hover:bg-black px-6 py-2 rounded-xl transition-all duration-300 text-sm font-bold shadow-md hover:shadow-lg group min-w-[80px]"
+                        className="px-4 py-1.5 bg-[#2D3B29] text-white hover:bg-black rounded-lg text-xs font-bold transition shadow-sm"
                       >
-                        <span className="relative z-10">Delete</span>
-                        <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                        Delete
                       </button>
                     </div>
-                  </td>
-                </tr>
+                  </div>
+                </div>
               );
             })}
-          </tbody>
-        </table>
+          </div>
+        </>
       )}
     </div>
   );

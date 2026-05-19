@@ -74,19 +74,19 @@ export default function AdminOrdersPage() {
   const filteredOrders = filter === 'All' ? orders : orders.filter(o => o.status === filter);
 
   return (
-    <div className="p-6 md:p-10 space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="p-4 sm:p-6 md:p-10 space-y-6 sm:space-y-8">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-extrabold text-[#2D3B29]">Order Management</h1>
-          <p className="text-gray-500 mt-1">Track and update customer orders in real-time</p>
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-[#2D3B29]">Order Management</h1>
+          <p className="text-sm text-gray-500 mt-1">Track and update customer orders in real-time</p>
         </div>
         
-        <div className="flex bg-white rounded-xl shadow-sm p-1 border border-gray-100">
+        <div className="flex flex-wrap bg-white rounded-xl shadow-sm p-1 border border-gray-100 w-full lg:w-auto">
           {['All', 'Not Shipped', 'Shipped', 'Delivered'].map((s) => (
             <button
               key={s}
               onClick={() => setFilter(s)}
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+              className={`flex-1 lg:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${
                 filter === s ? 'bg-[#629D23] text-white' : 'text-gray-500 hover:text-[#629D23]'
               }`}
             >
@@ -105,13 +105,13 @@ export default function AdminOrdersPage() {
         ) : (
           filteredOrders.map((order) => (
             <div key={order.id} className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="p-6 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="p-4 sm:p-6 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-[#E8F3DE] rounded-full flex items-center justify-center text-[#629D23]">
+                  <div className="w-12 h-12 bg-[#E8F3DE] rounded-full flex items-center justify-center text-[#629D23] flex-shrink-0">
                     <ShoppingBag size={24} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg text-[#2D3B29]">Order #{order.id.slice(0, 8)}</h3>
+                    <h3 className="font-bold text-base sm:text-lg text-[#2D3B29]">Order #{order.id.slice(0, 8)}</h3>
                     <div className="flex flex-col">
                       <p className="text-sm font-semibold text-[#629D23]">Customer: {order.user?.name || 'Guest'}</p>
                       <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleString()}</p>
@@ -119,16 +119,16 @@ export default function AdminOrdersPage() {
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-4">
-                  <div className="text-right">
-                    <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Total Amount</p>
-                    <p className="text-2xl font-black text-[#2D3B29]">Rs. {order.totalAmount.toLocaleString()}</p>
+                <div className="flex flex-row items-center justify-between md:justify-end gap-4 w-full md:w-auto pt-3 md:pt-0 border-t border-gray-100 md:border-none">
+                  <div className="text-left md:text-right">
+                    <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Total Amount</p>
+                    <p className="text-xl sm:text-2xl font-black text-[#2D3B29]">Rs. {order.totalAmount.toLocaleString()}</p>
                   </div>
                   
                   <select 
                     value={order.status}
                     onChange={(e) => updateStatus(order.id, e.target.value)}
-                    className={`px-4 py-2 rounded-xl text-sm font-bold border-none focus:ring-2 focus:ring-[#629D23] transition-colors ${
+                    className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border-none focus:ring-2 focus:ring-[#629D23] transition-colors ${
                       order.status === 'Delivered' ? 'bg-green-100 text-green-700' :
                       order.status === 'Shipped' ? 'bg-blue-100 text-blue-700' :
                       'bg-orange-100 text-orange-700'
