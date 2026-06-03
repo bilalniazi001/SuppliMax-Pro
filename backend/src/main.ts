@@ -25,13 +25,9 @@ async function bootstrap() {
   // CORS Configuration
   const allowedOrigins = process.env.FRONTEND_URL
     ? process.env.FRONTEND_URL.split(',').map(u => u.trim())
-    : null;
+    : [];
   app.enableCors({
-    origin: allowedOrigins
-      ? allowedOrigins
-      : (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-          callback(null, true); // Allow all origins when FRONTEND_URL is not set
-        },
+    origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
     credentials: true,
