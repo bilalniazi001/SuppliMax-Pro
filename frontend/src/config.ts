@@ -1,8 +1,5 @@
-const isVercel = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
-const isProd = isVercel || process.env.NODE_ENV === 'production';
-
-// Force the URL from env, with no hardcoded production fallback
-const rawUrl = process.env.NEXT_PUBLIC_API_URL || '';
+// Force the URL from env, or fallback to production Vercel URL
+const rawUrl = process.env.NEXT_PUBLIC_API_URL || 'https://supplimax-gym.vercel.app';
 
 if (typeof window !== 'undefined') {
   console.log('🌐 [CONFIG] SuppliMax API Base URL:', rawUrl);

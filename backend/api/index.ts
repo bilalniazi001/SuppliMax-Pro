@@ -23,10 +23,10 @@ export const createServer = async (expressInstance: any) => {
   // Improved CORS for Vercel
   const allowedOrigins = process.env.FRONTEND_URL
     ? process.env.FRONTEND_URL.split(',').map(u => u.trim())
-    : [];
+    : null;
 
   app.enableCors({
-    origin: allowedOrigins,
+    origin: allowedOrigins || ((origin: any, callback: any) => callback(null, true)),
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
