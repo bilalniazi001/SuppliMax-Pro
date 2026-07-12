@@ -123,16 +123,6 @@ export default async function ProductsPage() {
         </Link>
       </div>
 
-      {/* Debug Info */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-center">
-          <span className="text-blue-700 font-bold mr-2">✅ Data Structure Fixed</span>
-          <span className="text-sm text-blue-600">
-            Converted object with {products.length} products to array
-          </span>
-        </div>
-      </div>
-
       {products.length === 0 ? (
         <div className="text-center py-20 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
           <p className="text-gray-500 text-lg">No products found after conversion.</p>

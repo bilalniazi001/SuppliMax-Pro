@@ -461,6 +461,17 @@ export default function SuppliMaxNavbar() {
                     {link.name}
                   </Link>
                 ))}
+                {isAuthenticated && (
+                  <>
+                    <div className="border-t border-gray-100 mx-3 my-1" />
+                    <button
+                      onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+                      className="w-full text-left px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors duration-150"
+                    >
+                      Logout
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           )}

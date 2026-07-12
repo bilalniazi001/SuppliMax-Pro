@@ -330,11 +330,7 @@ const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ product }) =>
               </button>
             </div>
 
-            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-sm text-green-700 text-center">
-                <strong>Quick Inquiry:</strong> Click WhatsApp button to contact manager directly
-              </p>
-            </div>
+
           </div>
         </div>
       </div>
