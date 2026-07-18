@@ -124,7 +124,7 @@ const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ product }) =>
   const handleWhatsAppShare = () => {
     if (!product) return;
 
-    const whatsappNumber = '923215464895'; 
+    const whatsappNumber = '923045335175'; 
     
     const productUrl = `${window.location.origin}/product/${product.id}`;
     const message = ` *Product Inquiry*\n\n` +
