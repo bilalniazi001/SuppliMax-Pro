@@ -124,7 +124,7 @@ const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ product }) =>
   const handleWhatsAppShare = () => {
     if (!product) return;
 
-    const whatsappNumber = '923045335175'; 
+    const whatsappNumber = '923058666797'; 
     
     const productUrl = `${window.location.origin}/product/${product.id}`;
     const message = ` *Product Inquiry*\n\n` +
@@ -260,16 +260,16 @@ const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ product }) =>
                 <div className="mb-6 p-4 bg-gray-50 rounded-lg">
                   <h3 className="font-bold text-[#2D3B29] mb-2 uppercase text-xs tracking-wider opacity-60">Product Details</h3>
                   <div className="grid grid-cols-2 gap-2 text-sm text-[#2D3B29]">
-                    {product.size && (
-                      <div className="flex items-center space-x-1">
-                        <span className="font-bold opacity-70">Size:</span> 
-                        <span className="font-semibold">{product.size}</span>
-                      </div>
-                    )}
                     {product.color && (
                       <div className="flex items-center space-x-1">
                         <span className="font-bold opacity-70">Flavor:</span> 
                         <span className="font-semibold">{product.color}</span>
+                      </div>
+                    )}
+                    {product.size && (
+                      <div className="flex items-center space-x-1">
+                        <span className="font-bold opacity-70">Serving:</span> 
+                        <span className="font-semibold">{product.size}</span>
                       </div>
                     )}
                     {product.quantityInStock !== undefined && (

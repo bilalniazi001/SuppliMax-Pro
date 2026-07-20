@@ -167,6 +167,18 @@ export default function ProductForm({ initialData }: ProductFormProps) {
           </div>
         </div>
 
+        {/* Row 3: Flavor & Serving Size */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-700 mb-1">Flavor</label>
+            <input name="color" type="text" value={formData.color} onChange={handleChange} placeholder="e.g. Chocolate, Vanilla, Strawberry" className="p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-[#2D3B29] placeholder:text-[#2D3B29]/70" />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-700 mb-1">Serving Size</label>
+            <input name="size" type="text" value={formData.size} onChange={handleChange} placeholder="e.g. 30 servings, 60 servings" className="p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-[#2D3B29] placeholder:text-[#2D3B29]/70" />
+          </div>
+        </div>
+
         {/* Image Preview Row */}
         <div className="grid grid-cols-1 gap-4">
             <label className="text-sm font-semibold text-gray-700">Image URL</label>
