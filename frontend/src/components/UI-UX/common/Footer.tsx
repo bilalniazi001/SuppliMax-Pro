@@ -101,13 +101,8 @@ export default function Footer() {
                 </p>
 
                 <div className="flex items-start gap-2">
-                  <Mail size={16} className="text-[#629D23] mt-0.5 flex-shrink-0" />
-                  <span className={TEXT_COLOR}>bilalkhanniazi765@gmail.com</span>
-                </div>
-
-                <div className="flex items-start gap-2">
                   <Phone size={16} className="text-[#629D23] mt-0.5 flex-shrink-0" />
-                  <span className="text-xl font-bold text-green-600">+92 321 5464 895</span>
+                  <span className="text-xl font-bold text-green-600">+92 305 8666 797</span>
                 </div>
 
                 <div className="flex items-start gap-2">
